@@ -1019,6 +1019,9 @@ body {
 
   <div class="sidebar-nav">
     <div class="nav-section-label">Overview</div>
+    <a class="nav-item" href="cogna-os-map.html">
+      <span class="nav-icon">🗺️</span><span>OS Map</span>
+    </a>
     <a class="nav-item active" href="#sec-overview">
       <span class="nav-icon">⚡</span><span>Command Centre</span>
     </a>
@@ -1069,8 +1072,10 @@ body {
 
   <!-- TOP BAR -->
   <div class="topbar">
-    <div class="topbar-title">
-      Cogna OS · <span>Gareth's Command Centre</span>
+    <div class="topbar-title" style="display:flex;align-items:center;gap:12px;">
+      <a href="cogna-os-map.html" style="font-size:12px;color:rgba(255,255,255,0.4);text-decoration:none;font-weight:500;transition:color 0.2s" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">← OS Map</a>
+      <span style="color:rgba(255,255,255,0.2)">/</span>
+      Cogna OS · <span>Command Centre</span>
     </div>
     <div class="topbar-actions">
       <span class="badge badge-green">● LIVE</span>
@@ -1108,7 +1113,7 @@ body {
       </div>
     </div>
     <div class="hero-quick-links">
-      <a class="hero-link" href="#sec-dhl">
+      <a class="hero-link" href="dhl-command-centre.html">
         <span>📦 DHL Command Centre</span>
         <span class="hero-link-icon">↗</span>
       </a>
@@ -1360,7 +1365,7 @@ body {
 
       <!-- 8-Tool Suite -->
       <div class="account-tools">
-        <div class="account-tool live">
+        <div class="account-tool live" onclick="window.location='dhl-command-centre.html'" style="cursor:pointer">
           <div class="tool-icon">🎛️</div>
           <div class="tool-name">Command Centre</div>
           <div class="tool-desc">Account overview, next actions, deal timeline</div>
