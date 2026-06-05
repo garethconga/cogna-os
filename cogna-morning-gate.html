@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morning Gate — Cogna OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --canvas:       #EFEEEB;
+  --forest:       #1B2824;
+  --forest-tint:  #2D3D3A;
+  --forest-shade: #111A17;
+  --purple:       #5A58F2;
+  --purple-tint:  #9896F1;
+  --purple-shade: #252442;
+  --canvas-shade: #DCD9D5;
+  --orange:       #EC9151;
+  --orange-tint:  #F9B686;
+  --yellow:       #DFB549;
+  --yellow-tint:  #EFD48F;
+  --r: 10px; --rl: 16px;
+  --t: all 0.2s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Mona Sans','Inter',system-ui,sans-serif}
+body{background:var(--forest-shade);color:white;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── NAV BAR ── */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.logo{width:24px;height:24px;background:var(--purple);border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:white}
+.nav-name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.7)}
+.nav-links{display:flex;gap:4px}
+.nav-link{padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.4);text-decoration:none;transition:var(--t)}
+.nav-link:hover{color:white;background:rgba(255,255,255,0.07)}
+.nav-link.current{color:white;background:rgba(90,88,242,0.25)}
+.nav-right{font-size:11px;color:rgba(255,255,255,0.3)}
+
+/* ── GREETING ── */
+.greeting-bar{padding:40px 40px 0;display:flex;align-items:flex-end;justify-content:space-between}
+.greeting-text{}
+.greeting-time{font-size:13px;font-weight:500;color:rgba(255,255,255,0.35);margin-bottom:6px;letter-spacing:0.3px}
+.greeting-headline{font-size:42px;font-weight:800;letter-spacing:-1.5px;line-height:1.05;color:white}
+.greeting-headline em{font-style:normal;color:var(--purple-tint)}
+.greeting-date{margin-top:6px;font-size:14px;color:rgba(255,255,255,0.4);font-weight:500}
+.greeting-progress{text-align:right}
+.progress-ring-wrap{position:relative;width:80px;height:80px}
+.progress-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.progress-num{font-size:20px;font-weight:800;color:white;line-height:1}
+.progress-sub{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:rgba(255,255,255,0.4);margin-top:2px}
+
+/* ── MAIN GRID ── */
+.main{display:grid;grid-template-columns:1fr 1fr 320px;gap:20px;padding:28px 40px;flex:1}
+
+/* ── PANEL ── */
+.panel{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:var(--rl);padding:22px}
+.panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.35);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.panel-title span{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;text-transform:none;letter-spacing:0}
+
+/* ── CHECKLIST ── */
+.checklist{display:flex;flex-direction:column;gap:2px}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:var(--t);user-select:none}
+.check-item:hover{background:rgba(255,255,255,0.05)}
+.check-item.done{opacity:0.4}
+.check-box{width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:var(--t);font-size:11px;color:transparent}
+.check-item.done .check-box{background:var(--purple);border-color:var(--purple);color:white}
+.check-item.done .check-label{text-decoration:line-through}
+.check-label{font-size:13px;font-weight:600;color:white;line-height:1.3;margin-bottom:2px}
+.check-sub{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.4}
+
+/* ── PRIORITIES ── */
+.priority-list{display:flex;flex-direction:column;gap:10px}
+.priority-item{display:flex;align-items:center;gap:12px}
+.priority-num{width:24px;height:24px;border-radius:50%;background:rgba(90,88,242,0.25);color:var(--purple-tint);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.priority-input{flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:white;font-family:inherit;outline:none;transition:var(--t)}
+.priority-input::placeholder{color:rgba(255,255,255,0.25);font-weight:400}
+.priority-input:focus{border-color:var(--purple);background:rgba(90,88,242,0.1)}
+
+.divider-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.2);margin:16px 0 10px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06)}
+
+.focus-note{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);font-family:inherit;outline:none;resize:vertical;min-height:72px;transition:var(--t)}
+.focus-note::placeholder{color:rgba(255,255,255,0.2)}
+.focus-note:focus{border-color:var(--purple)}
+
+/* ── DEAL PULSE ── */
+.account-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.account-row:last-child{border-bottom:none}
+.account-left{display:flex;align-items:center;gap:10px}
+.account-icon{font-size:18px}
+.account-name{font-size:13px;font-weight:700;color:white}
+.account-stage{font-size:10px;color:rgba(255,255,255,0.4);margin-top:1px}
+.account-right{text-align:right}
+.account-score{font-size:13px;font-weight:800;color:white}
+.account-score-label{font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px}
+.status-pip{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
+.pip-active{background:#34C759}
+.pip-target{background:var(--orange)}
+.pip-blank{background:rgba(255,255,255,0.15)}
+
+.add-account{display:flex;align-items:center;gap:10px;padding:12px;border:1px dashed rgba(255,255,255,0.1);border-radius:8px;margin-top:10px;cursor:pointer;transition:var(--t);color:rgba(255,255,255,0.25);font-size:12px;font-weight:600}
+.add-account:hover{border-color:var(--purple);color:var(--purple-tint);background:rgba(90,88,242,0.1)}
+
+/* ── QUICK LINKS ── */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.ql{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:8px;text-decoration:none;color:white;font-size:12px;font-weight:600;transition:var(--t)}
+.ql:hover{background:rgba(90,88,242,0.2);border-color:var(--purple)}
+.ql-icon{font-size:15px;flex-shrink:0}
+
+/* ── AGENTS STRIP ── */
+.agents-strip{padding:16px 40px 20px;border-top:1px solid rgba(255,255,255,0.06)}
+.agents-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.25);margin-bottom:12px}
+.agents-row{display:flex;gap:8px;flex-wrap:wrap}
+.agent-chip{padding:7px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);cursor:pointer;transition:var(--t);user-select:none}
+.agent-chip:hover{background:rgba(90,88,242,0.25);border-color:var(--purple);color:var(--purple-tint)}
+.agent-chip.active{background:rgba(90,88,242,0.3);border-color:var(--purple);color:white}
+
+/* ── INVOKE BAR ── */
+.invoke-bar{display:none;padding:10px 40px;background:rgba(90,88,242,0.15);border-top:1px solid rgba(90,88,242,0.2)}
+.invoke-bar.show{display:flex;align-items:center;gap:12px}
+.invoke-label{font-size:11px;font-weight:700;color:var(--purple-tint);white-space:nowrap}
+.invoke-examples{display:flex;gap:8px;flex-wrap:wrap}
+.invoke-ex{padding:5px 12px;background:rgba(255,255,255,0.08);border-radius:6px;font-size:11px;color:rgba(255,255,255,0.7);cursor:pointer;transition:var(--t)}
+.invoke-ex:hover{background:rgba(90,88,242,0.3);color:white}
+
+/* ── DONE STATE ── */
+.gate-complete{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px;text-align:center}
+.gate-complete.show{display:flex}
+.gate-complete-icon{font-size:56px;margin-bottom:16px}
+.gate-complete-title{font-size:28px;font-weight:800;letter-spacing:-0.8px;margin-bottom:8px}
+.gate-complete-sub{font-size:14px;color:rgba(255,255,255,0.45);margin-bottom:28px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:var(--t);font-family:inherit;text-decoration:none}
+.btn-purple{background:var(--purple);color:white}
+.btn-purple:hover{background:var(--purple-shade)}
+.btn-ghost{background:rgba(255,255,255,0.08);color:white;border:1px solid rgba(255,255,255,0.12)}
+.btn-ghost:hover{background:rgba(255,255,255,0.14)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
+
+@media(max-width:1100px){.main{grid-template-columns:1fr 1fr}.main>*:last-child{grid-column:1/-1}}
+@media(max-width:700px){.main{grid-template-columns:1fr;padding:16px 20px}.greeting-bar{padding:24px 20px 0;flex-direction:column;align-items:flex-start;gap:16px}.nav{padding:12px 20px}.agents-strip{padding:12px 20px}.quick-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<div class="nav">
+  <div class="nav-brand">
+    <div class="logo">C</div>
+    <span class="nav-name">Cogna OS</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link current" href="cogna-morning-gate.html">🌅 Morning Gate</a>
+    <a class="nav-link" href="cogna-os-map.html">🗺️ OS Map</a>
+    <a class="nav-link" href="gareth-command-centre.html">⚡ Command Centre</a>
+    <a class="nav-link" href="dhl-command-centre.html">📦 DHL</a>
+  </div>
+  <div class="nav-right" id="nav-date"></div>
+</div>
+
+<!-- ── GREETING ── -->
+<div class="greeting-bar">
+  <div class="greeting-text">
+    <div class="greeting-time" id="greeting-time"></div>
+    <div class="greeting-headline" id="greeting-headline">Good morning,<br><em>Gareth.</em></div>
+    <div class="greeting-date" id="greeting-date"></div>
+  </div>
+  <div class="greeting-progress">
+    <div class="progress-ring-wrap">
+      <svg width="80" height="80" style="transform:rotate(-90deg)">
+        <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>
+        <circle id="progress-ring" cx="40" cy="40" r="34" fill="none" stroke="#5A58F2" stroke-width="5"
+          stroke-dasharray="213.6" stroke-dashoffset="213.6" stroke-linecap="round" style="transition:stroke-dashoffset 0.6s ease"/>
+      </svg>
+      <div class="progress-label">
+        <span class="progress-num" id="progress-num">0</span>
+        <span class="progress-sub">of 6</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main" id="main-content">
+
+  <!-- COL 1: CHECKLIST -->
+  <div class="panel">
+    <div class="panel-title">
+      Morning Checklist
+      <span id="checklist-badge" style="background:rgba(236,145,81,0.2);color:var(--orange-tint)">0 / 6</span>
+    </div>
+    <div class="checklist" id="checklist">
+      <div class="check-item" onclick="tick(this,0)">
+        <div class="check-box">✓</div>
+        <div>
+          <div class="check-label">Read Daily Brief</div>
+          <div class="check-sub">Check Slack DM — brief lands at 7:30am Mon–Fri</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="tick(this,1)">
+        <div class="check-box">✓</div>
+        <div>
+          <div class="check-label">Triage RECON signals</div>
+          <div class="check-sub">Review latest DHL news sweep and any sector alerts</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="tick(this,2)">
+        <div class="check-box">✓</div>
+        <div>
+          <div class="check-label">Check active accounts</div>
+          <div class="check-sub">Any overnight news on DHL? Any signal that changes today's plan?</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="tick(this,3)">
+        <div class="check-box">✓</div>
+        <div>
+          <div class="check-label">Review today's calendar</div>
+          <div class="check-sub">Prep for any prospect or customer calls — open call pack if needed</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="tick(this,4)">
+        <div class="check-box">✓</div>
+        <div>
+          <div class="check-label">Log any CRM updates</div>
+          <div class="check-sub">Anything from yesterday that needs logging before the day starts</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="tick(this,5)">
+        <div class="check-box">✓</div>
+        <div>
+          <div class="check-label">Set top 3 priorities →</div>
+          <div class="check-sub">Write them in the column on the right before you open email</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COL 2: PRIORITIES + DEALS -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+
+    <!-- PRIORITIES -->
+    <div class="panel">
+      <div class="panel-title">Today's Top 3</div>
+      <div class="priority-list">
+        <div class="priority-item">
+          <div class="priority-num">1</div>
+          <input class="priority-input" id="p1" type="text" placeholder="Most important thing today…" oninput="savePriorities()">
+        </div>
+        <div class="priority-item">
+          <div class="priority-num">2</div>
+          <input class="priority-input" id="p2" type="text" placeholder="Second priority…" oninput="savePriorities()">
+        </div>
+        <div class="priority-item">
+          <div class="priority-num">3</div>
+          <input class="priority-input" id="p3" type="text" placeholder="Third priority…" oninput="savePriorities()">
+        </div>
+      </div>
+
+      <div class="divider-label">Context &amp; blockers</div>
+      <textarea class="focus-note" id="focus-note" placeholder="Anything to note before the day starts — blockers, open questions, things to follow up…" oninput="saveNote()"></textarea>
+    </div>
+
+    <!-- DEAL PULSE -->
+    <div class="panel">
+      <div class="panel-title">Account Pulse</div>
+
+      <div class="account-row">
+        <div class="account-left">
+          <div class="account-icon">📦</div>
+          <div>
+            <div class="account-name"><span class="status-pip pip-active"></span>DHL Supply Chain UK</div>
+            <div class="account-stage">Pre-Discovery · EV Fleet trigger · 2026</div>
+          </div>
+        </div>
+        <div class="account-right">
+          <div class="account-score">19<span style="font-size:10px;font-weight:500;color:rgba(255,255,255,0.3)">/80</span></div>
+          <div class="account-score-label">MEDDPICC</div>
+        </div>
+      </div>
+
+      <div class="account-row" style="opacity:0.5">
+        <div class="account-left">
+          <div class="account-icon">🚆</div>
+          <div>
+            <div class="account-name"><span class="status-pip pip-target"></span>Network Rail</div>
+            <div class="account-stage">Target — RECON brief needed before outreach</div>
+          </div>
+        </div>
+        <div class="account-right">
+          <div class="account-score" style="font-size:11px;color:rgba(255,255,255,0.4)">Not started</div>
+        </div>
+      </div>
+
+      <div class="account-row" style="opacity:0.5">
+        <div class="account-left">
+          <div class="account-icon">🚌</div>
+          <div>
+            <div class="account-name"><span class="status-pip pip-target"></span>FirstGroup</div>
+            <div class="account-stage">Target — ZEV mandate angle · L&D Director EB</div>
+          </div>
+        </div>
+        <div class="account-right">
+          <div class="account-score" style="font-size:11px;color:rgba(255,255,255,0.4)">Not started</div>
+        </div>
+      </div>
+
+      <div class="add-account" onclick="promptAddAccount()">
+        <span style="font-size:16px">＋</span> Add account once confirmed
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COL 3: QUICK LINKS + SKILLS -->
+  <div style="display:flex;flex-direction:column;gap:16px">
+
+    <!-- QUICK LINKS -->
+    <div class="panel">
+      <div class="panel-title">Quick Links</div>
+      <div class="quick-grid">
+        <a class="ql" href="cogna-os-map.html"><span class="ql-icon">🗺️</span> OS Map</a>
+        <a class="ql" href="gareth-command-centre.html"><span class="ql-icon">⚡</span> Command Centre</a>
+        <a class="ql" href="dhl-command-centre.html"><span class="ql-icon">📦</span> DHL</a>
+        <a class="ql" href="gareth-command-centre.html#sec-meddpicc"><span class="ql-icon">📊</span> MEDDPICC</a>
+        <a class="ql" href="gareth-command-centre.html#sec-sectors"><span class="ql-icon">🏭</span> Sectors</a>
+        <a class="ql" href="gareth-command-centre.html#sec-agents"><span class="ql-icon">🤖</span> Agents</a>
+      </div>
+    </div>
+
+    <!-- SKILLS STATUS -->
+    <div class="panel">
+      <div class="panel-title">Intelligence Skills</div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:white">🌅 Daily Brief</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:1px">Mon–Fri · 7:30am · Slack DM</div>
+          </div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#34C759;flex-shrink:0"></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:white">📦 DHL News Sweep</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:1px">Daily · 9:00am · Slack DM</div>
+          </div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#34C759;flex-shrink:0"></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:white">📡 RECON Review</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:1px">Sun &amp; Wed · 8:00pm · LinkedIn + web</div>
+          </div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#34C759;flex-shrink:0"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESET -->
+    <button onclick="resetGate()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.35);font-family:inherit;cursor:pointer;transition:var(--t);width:100%"
+      onmouseover="this.style.color='white';this.style.background='rgba(255,255,255,0.08)'"
+      onmouseout="this.style.color='rgba(255,255,255,0.35)';this.style.background='rgba(255,255,255,0.05)'">
+      ↺ Reset checklist for new day
+    </button>
+
+  </div>
+</div>
+
+<!-- ── GATE COMPLETE ── -->
+<div class="gate-complete" id="gate-complete">
+  <div class="gate-complete-icon">⚡</div>
+  <div class="gate-complete-title">Gate cleared. You're loaded.</div>
+  <div class="gate-complete-sub">All six checks done. Priorities set. Go close something.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+    <a class="btn btn-purple" href="dhl-command-centre.html">📦 Open DHL Command Centre</a>
+    <a class="btn btn-ghost" href="gareth-command-centre.html">⚡ Command Centre</a>
+    <button class="btn btn-ghost" onclick="resetGate()">↺ Reset</button>
+  </div>
+</div>
+
+<!-- ── AGENTS STRIP ── -->
+<div class="agents-strip" id="agents-strip">
+  <div class="agents-label">Invoke an agent</div>
+  <div class="agents-row">
+    <div class="agent-chip" onclick="selectAgent(this,'PATHFINDER','plan the DHL territory play')">⚓ PATHFINDER</div>
+    <div class="agent-chip" onclick="selectAgent(this,'RECON','sweep DHL UK for executive news')">📡 RECON</div>
+    <div class="agent-chip" onclick="selectAgent(this,'COMMS','draft DHL cold outreach — EV angle')">✉️ COMMS</div>
+    <div class="agent-chip" onclick="selectAgent(this,'ORACLE','score DHL deal risk and next best action')">🔮 ORACLE</div>
+    <div class="agent-chip" onclick="selectAgent(this,'EDGE','who is DHL\\'s likely incumbent LMS vendor')">⚔️ EDGE</div>
+    <div class="agent-chip" onclick="selectAgent(this,'DEBRIEF','summarise my last call notes')">📝 DEBRIEF</div>
+    <div class="agent-chip" onclick="selectAgent(this,'ARCHITECT','what should I build next in the OS')">🧱 ARCHITECT</div>
+    <div class="agent-chip" onclick="selectAgent(this,'COUNSEL','review this contract clause')">⚖️ COUNSEL</div>
+  </div>
+</div>
+
+<div class="invoke-bar" id="invoke-bar">
+  <span class="invoke-label" id="invoke-label">Invoke prompt:</span>
+  <div class="invoke-examples" id="invoke-examples"></div>
+</div>
+
+<script>
+/* ── Storage keys ── */
+const KEYS = { checks:'mg_checks', p1:'mg_p1', p2:'mg_p2', p3:'mg_p3', note:'mg_note' };
+
+/* ── Greeting ── */
+(function(){
+  const d = new Date();
+  const h = d.getHours();
+  const greeting = h < 12 ? 'Good morning,' : h < 17 ? 'Good afternoon,' : 'Good evening,';
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  document.getElementById('greeting-headline').innerHTML = greeting + '<br><em>Gareth.</em>';
+  document.getElementById('greeting-time').textContent =
+    d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) + ' · ' +
+    (h < 12 ? 'Morning session' : h < 17 ? 'Afternoon session' : 'Evening session');
+  const dateStr = days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  document.getElementById('greeting-date').textContent = dateStr;
+  document.getElementById('nav-date').textContent = dateStr;
+})();
+
+/* ── Checklist ── */
+function getChecks(){ try{ return JSON.parse(localStorage.getItem(KEYS.checks))||[]; }catch(e){ return []; } }
+function saveChecks(arr){ try{ localStorage.setItem(KEYS.checks, JSON.stringify(arr)); }catch(e){} }
+
+function updateRing(done){
+  const total = 6;
+  const circ = 213.6;
+  const offset = circ - (done / total) * circ;
+  document.getElementById('progress-ring').style.strokeDashoffset = offset;
+  document.getElementById('progress-num').textContent = done;
+  const badge = document.getElementById('checklist-badge');
+  badge.textContent = done + ' / ' + total;
+  if(done === total){
+    badge.style.background = 'rgba(52,199,89,0.2)';
+    badge.style.color = '#5EDA72';
+    setTimeout(showComplete, 400);
+  } else {
+    badge.style.background = 'rgba(236,145,81,0.2)';
+    badge.style.color = 'var(--orange-tint)';
+  }
+}
+
+function showComplete(){
+  document.getElementById('main-content').style.display = 'none';
+  document.getElementById('gate-complete').classList.add('show');
+  document.getElementById('agents-strip').style.display = 'none';
+  document.getElementById('invoke-bar').classList.remove('show');
+}
+
+window.tick = function(el, idx){
+  el.classList.toggle('done');
+  const checks = getChecks();
+  const pos = checks.indexOf(idx);
+  if(pos === -1) checks.push(idx); else checks.splice(pos,1);
+  saveChecks(checks);
+  const done = document.querySelectorAll('.check-item.done').length;
+  updateRing(done);
+};
+
+(function(){
+  const saved = getChecks();
+  const items = document.querySelectorAll('.check-item');
+  saved.forEach(i => { if(items[i]) items[i].classList.add('done'); });
+  updateRing(document.querySelectorAll('.check-item.done').length);
+})();
+
+/* ── Priorities ── */
+function savePriorities(){
+  try{
+    localStorage.setItem(KEYS.p1, document.getElementById('p1').value);
+    localStorage.setItem(KEYS.p2, document.getElementById('p2').value);
+    localStorage.setItem(KEYS.p3, document.getElementById('p3').value);
+  }catch(e){}
+}
+function saveNote(){ try{ localStorage.setItem(KEYS.note, document.getElementById('focus-note').value); }catch(e){} }
+
+(function(){
+  ['p1','p2','p3'].forEach(k => {
+    const el = document.getElementById(k);
+    if(el){ try{ el.value = localStorage.getItem(KEYS[k])||''; }catch(e){} }
+  });
+  const note = document.getElementById('focus-note');
+  if(note){ try{ note.value = localStorage.getItem(KEYS.note)||''; }catch(e){} }
+})();
+
+/* ── Reset ── */
+window.resetGate = function(){
+  document.querySelectorAll('.check-item').forEach(el => el.classList.remove('done'));
+  saveChecks([]);
+  updateRing(0);
+  document.getElementById('main-content').style.display = 'grid';
+  document.getElementById('gate-complete').classList.remove('show');
+  document.getElementById('agents-strip').style.display = 'block';
+};
+
+/* ── Agents ── */
+window.selectAgent = function(el, agent, prompt){
+  document.querySelectorAll('.agent-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const bar = document.getElementById('invoke-bar');
+  bar.classList.add('show');
+  document.getElementById('invoke-label').textContent = agent + ':';
+  const ex = document.getElementById('invoke-examples');
+  ex.innerHTML = `<div class="invoke-ex" onclick="copyPrompt('${agent}, ${prompt}')">"${agent}, ${prompt}"</div>`;
+};
+
+window.copyPrompt = function(text){
+  try{ navigator.clipboard.writeText(text); } catch(e){}
+  const chips = document.querySelectorAll('.invoke-ex');
+  chips.forEach(c => { c.textContent = '✓ Copied — paste into Cowork'; c.style.color='#5EDA72'; });
+  setTimeout(() => {
+    document.getElementById('invoke-bar').classList.remove('show');
+    document.querySelectorAll('.agent-chip').forEach(c => c.classList.remove('active'));
+  }, 2000);
+};
+
+window.promptAddAccount = function(){
+  const name = prompt('Account name (you can update this later):');
+  if(name && name.trim()){
+    alert('Add "' + name.trim() + '" to your OS by telling ARCHITECT in Cowork:\n\n"ARCHITECT, add ' + name.trim() + ' as a new account in my OS"');
+  }
+};
+</script>
+</body>
+</html>
