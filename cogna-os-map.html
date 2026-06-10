@@ -7,28 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Mona+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --canvas:       #EFEEEB;
-  --forest:       #1B2824;
-  --forest-tint:  #2D3D3A;
-  --forest-shade: #111A17;
-  --purple:       #5A58F2;
-  --purple-tint:  #9896F1;
-  --purple-shade: #252442;
-  --canvas-shade: #DCD9D5;
-  --orange:       #EC9151;
-  --orange-tint:  #F9B686;
-  --yellow:       #DFB549;
-  --yellow-tint:  #EFD48F;
-  --white:        #FFFFFF;
-  --r:            10px;
-  --rl:           16px;
-  --t:            all 0.2s cubic-bezier(.4,0,.2,1);
+  --canvas:#EFEEEB;--forest:#1B2824;--forest-tint:#2D3D3A;--forest-shade:#111A17;
+  --purple:#5A58F2;--purple-tint:#9896F1;--purple-shade:#252442;
+  --canvas-shade:#DCD9D5;--orange:#EC9151;--orange-tint:#F9B686;
+  --yellow:#DFB549;--yellow-tint:#EFD48F;--white:#FFFFFF;
+  --r:10px;--rl:16px;--t:all 0.2s cubic-bezier(.4,0,.2,1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Mona Sans','Inter',system-ui,sans-serif;background:var(--canvas);color:var(--forest);min-height:100vh}
-
-/* ── TOPBAR ── */
 .topbar{background:var(--forest-shade);color:white;padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
 .topbar-brand{display:flex;align-items:center;gap:10px}
 .logo{width:26px;height:26px;background:var(--purple);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:white}
@@ -37,47 +24,38 @@ body{font-family:'Mona Sans','Inter',system-ui,sans-serif;background:var(--canva
 .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .badge-green{background:rgba(52,199,89,0.2);color:#5EDA72}
 .badge-purple{background:rgba(90,88,242,0.25);color:var(--purple-tint)}
-
-/* ── HERO ── */
 .hero{background:var(--forest);color:white;padding:52px 60px 48px;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:rgba(90,88,242,0.08)}
-.hero::after{content:'';position:absolute;bottom:-60px;left:300px;width:250px;height:250px;border-radius:50%;background:rgba(90,88,242,0.05)}
 .hero-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--purple-tint);margin-bottom:14px}
 .hero-headline{font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:12px}
 .hero-headline em{font-style:normal;color:var(--purple-tint)}
-.hero-sub{font-size:15px;color:rgba(255,255,255,0.5);line-height:1.6;max-width:520px;margin-bottom:36px}
+.hero-sub{font-size:15px;color:rgba(255,255,255,0.5);line-height:1.6;max-width:560px;margin-bottom:36px}
 .hero-stats{display:flex;gap:40px;flex-wrap:wrap}
 .stat-val{font-size:36px;font-weight:800;color:white;letter-spacing:-1px;line-height:1}
 .stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.35);font-weight:700;margin-top:4px}
-
-/* ── PAGE BODY ── */
-.body{padding:48px 60px;max-width:1360px}
-
-/* ── LAYER HEADERS ── */
+.body{padding:48px 60px;max-width:1400px}
 .layer{margin-bottom:48px}
 .layer-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}
 .layer-num{width:28px;height:28px;border-radius:50%;background:var(--purple);color:white;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .layer-title{font-size:20px;font-weight:800;letter-spacing:-0.5px;color:var(--forest)}
 .layer-desc{font-size:13px;color:rgba(27,40,36,0.5);margin-left:auto;font-weight:500}
-
-/* ── OS TILES ── */
 .tiles{display:grid;gap:14px}
 .tiles-4{grid-template-columns:repeat(4,1fr)}
 .tiles-3{grid-template-columns:repeat(3,1fr)}
 .tiles-2{grid-template-columns:repeat(2,1fr)}
-.tiles-8{grid-template-columns:repeat(4,1fr)}
-
 .tile{background:white;border:1px solid var(--canvas-shade);border-radius:var(--rl);padding:22px;text-decoration:none;color:var(--forest);display:block;transition:var(--t);position:relative;overflow:hidden}
 .tile:hover{border-color:var(--purple-tint);box-shadow:0 4px 20px rgba(27,40,36,0.1);transform:translateY(-2px)}
 .tile.dark{background:var(--forest);color:white;border-color:transparent}
 .tile.dark:hover{background:var(--forest-tint);border-color:var(--purple)}
 .tile.featured{border:2px solid var(--purple)}
-
+.tile.dim{opacity:0.55}
 .tile-status{position:absolute;top:14px;right:14px;font-size:8px;font-weight:800;letter-spacing:0.8px;padding:3px 7px;border-radius:3px;text-transform:uppercase}
 .s-live{background:rgba(52,199,89,0.12);color:#1C7A30}
 .s-building{background:rgba(236,145,81,0.12);color:#8A400F}
 .s-planned{background:rgba(27,40,36,0.07);color:rgba(27,40,36,0.4)}
-
+.s-t1{background:rgba(90,88,242,0.15);color:var(--purple)}
+.s-t2{background:rgba(223,181,73,0.15);color:#866613}
+.s-t3{background:rgba(27,40,36,0.07);color:rgba(27,40,36,0.35)}
 .tile-icon{font-size:24px;margin-bottom:12px;display:block}
 .tile-title{font-size:14px;font-weight:700;color:var(--forest);margin-bottom:5px;letter-spacing:-0.2px}
 .tile.dark .tile-title{color:white}
@@ -85,37 +63,44 @@ body{font-family:'Mona Sans','Inter',system-ui,sans-serif;background:var(--canva
 .tile.dark .tile-body{color:rgba(255,255,255,0.5)}
 .tile-link{display:inline-flex;align-items:center;gap:4px;margin-top:10px;font-size:11px;font-weight:700;color:var(--purple);text-decoration:none}
 .tile.dark .tile-link{color:var(--purple-tint)}
-
-/* Agent tiles */
+.tier-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(27,40,36,0.4);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.tier-pip{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pip-t1{background:var(--purple)}
+.pip-t2{background:var(--yellow)}
+.pip-t3{background:var(--canvas-shade)}
+.acct-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.acct-card{background:white;border:1px solid var(--canvas-shade);border-radius:var(--r);padding:14px 16px;text-decoration:none;color:var(--forest);transition:var(--t);display:block;position:relative}
+.acct-card:hover{border-color:var(--purple-tint);box-shadow:0 2px 10px rgba(27,40,36,0.08);transform:translateY(-1px)}
+.acct-card.t1{border-left:3px solid var(--purple)}
+.acct-card.t2{border-left:3px solid var(--yellow)}
+.acct-card.t3{border-left:3px solid var(--canvas-shade)}
+.acct-name{font-size:13px;font-weight:700;color:var(--forest);margin-bottom:3px}
+.acct-sector{font-size:10px;color:rgba(27,40,36,0.45);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.acct-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:0.4px}
+.tag-t1{background:rgba(90,88,242,0.1);color:var(--purple)}
+.tag-t2{background:rgba(223,181,73,0.12);color:#866613}
+.tag-t3{background:rgba(27,40,36,0.07);color:rgba(27,40,36,0.4)}
+.tag-live{background:rgba(52,199,89,0.1);color:#1C7A30}
+.tag-inf{background:rgba(236,145,81,0.12);color:#8A400F}
 .agent-tile{background:var(--forest-shade);border:1px solid rgba(255,255,255,0.07);border-radius:var(--r);padding:16px;transition:var(--t)}
 .agent-tile:hover{border-color:var(--purple);background:var(--forest-tint)}
 .agent-callsign{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--purple-tint);margin-bottom:4px}
 .agent-name{font-size:13px;font-weight:700;color:white;margin-bottom:4px}
 .agent-role{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.4}
 .agent-invoke{margin-top:8px;font-size:10px;font-weight:600;color:var(--purple-tint);background:rgba(90,88,242,0.15);padding:3px 8px;border-radius:4px;display:inline-block}
-
-/* ── DIVIDER ── */
-.divider{height:1px;background:var(--canvas-shade);margin:8px 0 48px}
-
-/* ── SCHEDULE STRIP ── */
-.schedule-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.sched-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .sched-card{background:white;border:1px solid var(--canvas-shade);border-radius:var(--r);padding:16px}
 .sched-name{font-size:13px;font-weight:700;color:var(--forest);margin-bottom:3px}
 .sched-time{font-size:11px;color:rgba(27,40,36,0.45)}
-.sched-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
-.dot-live{background:#34C759}
-.dot-build{background:var(--orange)}
-
-/* ── FOOTER ── */
+.dot-live{display:inline-block;width:7px;height:7px;border-radius:50%;background:#34C759;margin-right:6px}
 .footer{padding:32px 60px;border-top:1px solid var(--canvas-shade);display:flex;justify-content:space-between;align-items:center;font-size:11px;color:rgba(27,40,36,0.4)}
-
-@media(max-width:1100px){.tiles-4,.tiles-8{grid-template-columns:repeat(2,1fr)}.body{padding:32px}.hero{padding:36px}}
-@media(max-width:700px){.tiles-4,.tiles-8,.tiles-3,.tiles-2{grid-template-columns:1fr}.hero-headline{font-size:32px}.body{padding:20px}.hero{padding:24px 20px}.schedule-strip{grid-template-columns:1fr}}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--canvas-shade);border-radius:3px}
+@media(max-width:1100px){.tiles-4,.acct-grid{grid-template-columns:repeat(2,1fr)}.body{padding:32px}.hero{padding:36px}}
+@media(max-width:700px){.tiles-4,.acct-grid,.tiles-3,.tiles-2{grid-template-columns:1fr}.hero-headline{font-size:32px}.body{padding:20px}.hero{padding:24px 20px}.sched-strip{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- ── TOPBAR ── -->
 <div class="topbar">
   <div class="topbar-brand">
     <div class="logo">C</div>
@@ -128,39 +113,22 @@ body{font-family:'Mona Sans','Inter',system-ui,sans-serif;background:var(--canva
   </div>
 </div>
 
-<!-- ── HERO ── -->
 <div class="hero">
   <div class="hero-eyebrow">Cogna Operating System · Gareth · UK Territory</div>
   <div class="hero-headline">Your sales OS,<br><em>one place.</em></div>
-  <div class="hero-sub">Everything connected. Intelligence running automatically. DHL active. Logistics &amp; Rail covered. Eight agents on call.</div>
+  <div class="hero-sub">Rail · Aviation · Roads &amp; Ports · Urban &amp; Services. 17 accounts. 4 sectors. 8 agents. Intelligence running automatically every day.</div>
   <div class="hero-stats">
-    <div>
-      <div class="stat-val">1</div>
-      <div class="stat-label">Active Account</div>
-    </div>
-    <div>
-      <div class="stat-val">2</div>
-      <div class="stat-label">Sectors</div>
-    </div>
-    <div>
-      <div class="stat-val">8</div>
-      <div class="stat-label">AI Agents</div>
-    </div>
-    <div>
-      <div class="stat-val">3</div>
-      <div class="stat-label">Auto Skills</div>
-    </div>
-    <div>
-      <div class="stat-val">3</div>
-      <div class="stat-label">Live Pages</div>
-    </div>
+    <div><div class="stat-val">17</div><div class="stat-label">Accounts</div></div>
+    <div><div class="stat-val">4</div><div class="stat-label">Sectors</div></div>
+    <div><div class="stat-val">3</div><div class="stat-label">Tier 1 Targets</div></div>
+    <div><div class="stat-val">8</div><div class="stat-label">AI Agents</div></div>
+    <div><div class="stat-val">3</div><div class="stat-label">Auto Skills</div></div>
   </div>
 </div>
 
-<!-- ── BODY ── -->
 <div class="body">
 
-  <!-- LAYER 1 · CORE OS -->
+  <!-- LAYER 1: CORE OS -->
   <div class="layer">
     <div class="layer-header">
       <div class="layer-num">1</div>
@@ -168,234 +136,187 @@ body{font-family:'Mona Sans','Inter',system-ui,sans-serif;background:var(--canva
       <div class="layer-desc">Your daily operating layer</div>
     </div>
     <div class="tiles tiles-3">
-
-      <a class="tile featured" href="gareth-command-centre.html">
-        <span class="tile-status s-live">Live</span>
-        <span class="tile-icon">⚡</span>
-        <div class="tile-title">Command Centre</div>
-        <div class="tile-body">Your tactical headquarters. Morning Gate checklist, sector intelligence, pipeline view, agent roster, MEDDPICC, data flow. Start here every day.</div>
-        <span class="tile-link">Open →</span>
-      </a>
-
       <a class="tile" href="cogna-morning-gate.html">
         <span class="tile-status s-live">Live</span>
         <span class="tile-icon">🌅</span>
         <div class="tile-title">Morning Gate</div>
-        <div class="tile-body">Daily ritual start page. Checklist, top 3 priorities, account pulse, agent shortcuts. Under 5 minutes. Set as your browser home tab.</div>
+        <div class="tile-body">Daily ritual start page. Checklist, top 3 priorities, account pulse, agent shortcuts. Set as your browser home tab.</div>
         <span class="tile-link">Open →</span>
       </a>
-
-      <div class="tile">
+      <a class="tile featured" href="gareth-command-centre.html">
+        <span class="tile-status s-live">Live</span>
+        <span class="tile-icon">⚡</span>
+        <div class="tile-title">Command Centre</div>
+        <div class="tile-body">Tactical headquarters. Sector intelligence, pipeline, agents, MEDDPICC, data flow. Your day-to-day OS hub.</div>
+        <span class="tile-link">Open →</span>
+      </a>
+      <div class="tile dim">
         <span class="tile-status s-planned">Planned</span>
         <span class="tile-icon">🔭</span>
         <div class="tile-title">RECON Review</div>
-        <div class="tile-body">Live intelligence triage page. Signals rated HIGH or MEDIUM. Approve, flag or dismiss. Auto-updated by twice-weekly RECON skill run.</div>
+        <div class="tile-body">Live intelligence triage page. Signals across all 17 accounts rated HIGH or MEDIUM. Auto-updated by RECON skill.</div>
         <span class="tile-link" style="color:rgba(27,40,36,0.3)">Coming soon</span>
       </div>
-
     </div>
   </div>
 
-  <!-- LAYER 2 · ACCOUNTS -->
+  <!-- LAYER 2: ACCOUNTS -->
   <div class="layer">
     <div class="layer-header">
       <div class="layer-num">2</div>
       <div class="layer-title">Account Layer</div>
-      <div class="layer-desc">Active campaigns &amp; targets</div>
+      <div class="layer-desc">17 accounts · 3 tiers</div>
     </div>
 
-    <!-- DHL Active -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(27,40,36,0.4);margin-bottom:10px">📦 DHL Supply Chain UK — Active Campaign</div>
-      <div class="tiles tiles-8">
-        <a class="tile dark" href="dhl-command-centre.html">
-          <span class="tile-status s-live" style="background:rgba(90,88,242,0.25);color:var(--purple-tint)">Live</span>
-          <span class="tile-icon">🎛️</span>
-          <div class="tile-title">Command Centre</div>
-          <div class="tile-body">Deal stage, next actions, timeline, intelligence signals.</div>
-          <span class="tile-link">Open →</span>
-        </a>
-        <div class="tile dark">
-          <span class="tile-status s-live" style="background:rgba(90,88,242,0.25);color:var(--purple-tint)">Live</span>
-          <span class="tile-icon">📰</span>
-          <div class="tile-title">News Intelligence</div>
-          <div class="tile-body">180-day rolling news sweep. DHL, logistics, EV fleet signals.</div>
-        </div>
-        <div class="tile dark">
-          <span class="tile-status s-live" style="background:rgba(90,88,242,0.25);color:var(--purple-tint)">Live</span>
-          <span class="tile-icon">📊</span>
-          <div class="tile-title">MEDDPICC</div>
-          <div class="tile-body">8 criteria · 80pt max · 19/80 current score.</div>
-        </div>
-        <div class="tile dark">
-          <span class="tile-status s-live" style="background:rgba(90,88,242,0.25);color:var(--purple-tint)">Live</span>
-          <span class="tile-icon">🗺️</span>
-          <div class="tile-title">Stakeholder Map</div>
-          <div class="tile-body">5 named roles mapped. EB and Champion TBC.</div>
-        </div>
-        <div class="tile dark">
-          <span class="tile-status s-building">Building</span>
-          <span class="tile-icon">💬</span>
-          <div class="tile-title">Value Statement</div>
-          <div class="tile-body">6 value dimensions mapped to DHL Strategy 2030 pillars.</div>
-        </div>
-        <div class="tile dark">
-          <span class="tile-status s-building">Building</span>
-          <span class="tile-icon">✉️</span>
-          <div class="tile-title">Outreach Sequences</div>
-          <div class="tile-body">5 tracks, personalised by persona and pain.</div>
-        </div>
-        <div class="tile dark">
-          <span class="tile-status s-building">Building</span>
-          <span class="tile-icon">💰</span>
-          <div class="tile-title">ROI Model</div>
-          <div class="tile-body">CFO-ready. EV driver upskilling cost avoidance baseline.</div>
-        </div>
-        <div class="tile dark">
-          <span class="tile-status s-building">Building</span>
-          <span class="tile-icon">📐</span>
-          <div class="tile-title">Executive Deck</div>
-          <div class="tile-body">Wave 1 intro + EB meeting. Vision Painter v5.</div>
-        </div>
+    <!-- TIER 1 -->
+    <div class="tier-label"><span class="tier-pip pip-t1"></span>Tier 1 — Full command centre suite</div>
+    <div class="acct-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+      <a class="acct-card t1" href="network-rail-command-centre.html">
+        <span class="acct-name">🚆 Network Rail</span>
+        <div class="acct-sector">Rail · Infrastructure</div>
+        <span class="acct-tag tag-live">Active</span>
+      </a>
+      <div class="acct-card t1">
+        <span class="acct-name">✈️ Heathrow Airport</span>
+        <div class="acct-sector">Aviation</div>
+        <span class="acct-tag tag-t1">Tier 1 · Building</span>
+      </div>
+      <div class="acct-card t1">
+        <span class="acct-name">🏙️ Transport for London</span>
+        <div class="acct-sector">Urban &amp; Services</div>
+        <span class="acct-tag tag-t1">Tier 1 · Building</span>
       </div>
     </div>
 
-    <!-- Target Accounts -->
-    <div>
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(27,40,36,0.4);margin-bottom:10px">🎯 Target Accounts</div>
-      <div class="tiles tiles-3">
-        <div class="tile">
-          <span class="tile-status s-planned">Targeting</span>
-          <span class="tile-icon">🚆</span>
-          <div class="tile-title">Network Rail</div>
-          <div class="tile-body">ORR safety competency frameworks. GBR transition creating workforce urgency. RECON brief before outreach.</div>
-        </div>
-        <div class="tile">
-          <span class="tile-status s-planned">Targeting</span>
-          <span class="tile-icon">🚌</span>
-          <div class="tile-title">FirstGroup</div>
-          <div class="tile-body">Largest UK bus &amp; rail operator. ZEV mandate = retraining at scale. L&D Director likely EB.</div>
-        </div>
-        <div class="tile" style="border-style:dashed">
-          <span class="tile-icon" style="opacity:0.3">➕</span>
-          <div class="tile-title" style="color:rgba(27,40,36,0.3)">Add next account</div>
-          <div class="tile-body">Ask PATHFINDER to identify the next UK priority account in Logistics or Rail.</div>
-        </div>
+    <!-- TIER 2 -->
+    <div class="tier-label"><span class="tier-pip pip-t2"></span>Tier 2 — Account brief + RECON</div>
+    <div class="acct-grid" style="margin-bottom:20px">
+      <div class="acct-card t2">
+        <span class="acct-name">🚌 Go-Ahead Group</span>
+        <div class="acct-sector">Rail &amp; Bus</div>
+        <span class="acct-tag tag-t2">Tier 2</span>
       </div>
+      <div class="acct-card t2">
+        <span class="acct-name">✈️ Manchester Airport Group</span>
+        <div class="acct-sector">Aviation</div>
+        <span class="acct-tag tag-t2">Tier 2</span>
+      </div>
+      <div class="acct-card t2">
+        <span class="acct-name">🛣️ National Highways</span>
+        <div class="acct-sector">Roads &amp; Ports</div>
+        <span class="acct-tag tag-t2">Tier 2</span>
+      </div>
+      <div class="acct-card t2">
+        <span class="acct-name">🚆 LNER</span>
+        <div class="acct-sector">Rail · TOC</div>
+        <span class="acct-tag tag-t2">Tier 2</span>
+      </div>
+      <div class="acct-card t2">
+        <span class="acct-name">🏛️ Dept for Transport</span>
+        <div class="acct-sector">Government</div>
+        <span class="acct-tag tag-inf">Strategic Influencer</span>
+      </div>
+      <div class="acct-card t2">
+        <span class="acct-name">🚄 Heathrow Express</span>
+        <div class="acct-sector">Rail · Aviation gateway</div>
+        <span class="acct-tag tag-t2">Fast entry → Heathrow group</span>
+      </div>
+    </div>
+
+    <!-- TIER 3 -->
+    <div class="tier-label"><span class="tier-pip pip-t3"></span>Tier 3 — Monitor &amp; track</div>
+    <div class="acct-grid">
+      <div class="acct-card t3"><span class="acct-name">🚆 Avanti West Coast</span><div class="acct-sector">Rail · TOC</div><span class="acct-tag tag-t3">Monitor</span></div>
+      <div class="acct-card t3"><span class="acct-name">🔧 Colas Rail</span><div class="acct-sector">Rail · Contractor</div><span class="acct-tag tag-t3">Monitor</span></div>
+      <div class="acct-card t3"><span class="acct-name">🔧 VolkerRail</span><div class="acct-sector">Rail · Contractor</div><span class="acct-tag tag-t3">Monitor</span></div>
+      <div class="acct-card t3"><span class="acct-name">🏢 ABM UK</span><div class="acct-sector">Facilities &amp; Services</div><span class="acct-tag tag-t3">Monitor</span></div>
+      <div class="acct-card t3"><span class="acct-name">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Transport Scotland</span><div class="acct-sector">Roads · Government</div><span class="acct-tag tag-t3">Monitor</span></div>
+      <div class="acct-card t3"><span class="acct-name">⚓ Associated British Ports</span><div class="acct-sector">Ports &amp; Maritime</div><span class="acct-tag tag-t3">Monitor</span></div>
+      <div class="acct-card t3"><span class="acct-name">⚓ Port of London</span><div class="acct-sector">Ports &amp; Maritime</div><span class="acct-tag tag-t3">Monitor</span></div>
+      <div class="acct-card t3"><span class="acct-name">✈️ Vinci Airports</span><div class="acct-sector">Aviation</div><span class="acct-tag tag-t3">Monitor</span></div>
     </div>
   </div>
 
-  <!-- LAYER 3 · INTELLIGENCE -->
+  <!-- LAYER 3: INTELLIGENCE -->
   <div class="layer">
     <div class="layer-header">
       <div class="layer-num">3</div>
       <div class="layer-title">Live Intelligence</div>
       <div class="layer-desc">Auto-generated · scheduled daily</div>
     </div>
-    <div class="schedule-strip">
+    <div class="sched-strip">
       <div class="sched-card">
-        <div style="margin-bottom:8px"><span class="sched-dot dot-live"></span><span style="font-size:10px;font-weight:700;color:#1C7A30;text-transform:uppercase;letter-spacing:0.5px">Live</span></div>
+        <div style="margin-bottom:8px"><span class="dot-live"></span><span style="font-size:10px;font-weight:700;color:#1C7A30;text-transform:uppercase;letter-spacing:0.5px">Live</span></div>
         <div class="sched-name">🌅 Daily Brief</div>
         <div class="sched-time">Mon–Fri · 7:30am · Gmail + Calendar + Slack → Slack DM</div>
       </div>
       <div class="sched-card">
-        <div style="margin-bottom:8px"><span class="sched-dot dot-live"></span><span style="font-size:10px;font-weight:700;color:#1C7A30;text-transform:uppercase;letter-spacing:0.5px">Live</span></div>
-        <div class="sched-name">📦 DHL News Sweep</div>
-        <div class="sched-time">Daily · 9:00am · Web search → Slack DM</div>
+        <div style="margin-bottom:8px"><span class="dot-live"></span><span style="font-size:10px;font-weight:700;color:#1C7A30;text-transform:uppercase;letter-spacing:0.5px">Live</span></div>
+        <div class="sched-name">🔍 Territory News Sweep</div>
+        <div class="sched-time">Daily · 9:00am · Network Rail, Heathrow, TfL + sector signals → Slack DM</div>
       </div>
       <div class="sched-card">
-        <div style="margin-bottom:8px"><span class="sched-dot dot-live"></span><span style="font-size:10px;font-weight:700;color:#1C7A30;text-transform:uppercase;letter-spacing:0.5px">Live · LinkedIn</span></div>
+        <div style="margin-bottom:8px"><span class="dot-live"></span><span style="font-size:10px;font-weight:700;color:#1C7A30;text-transform:uppercase;letter-spacing:0.5px">Live · LinkedIn</span></div>
         <div class="sched-name">📡 RECON Review</div>
-        <div class="sched-time">Sun &amp; Wed · 8:00pm · LinkedIn + web → Slack DM</div>
+        <div class="sched-time">Sun &amp; Wed · 8:00pm · 17 accounts · LinkedIn + web → Slack DM</div>
       </div>
     </div>
   </div>
 
-  <!-- LAYER 4 · AGENTS -->
+  <!-- LAYER 4: AGENTS -->
   <div class="layer">
     <div class="layer-header">
       <div class="layer-num">4</div>
       <div class="layer-title">Agent Team</div>
       <div class="layer-desc">8 specialists · invoke by name in Cowork</div>
     </div>
-    <div class="tiles tiles-8" style="gap:10px">
-      <div class="agent-tile">
-        <div class="agent-callsign">Pathfinder</div>
-        <div class="agent-name">Strategic Navigator</div>
-        <div class="agent-role">Territory play, account prioritisation, where to go next.</div>
-        <div class="agent-invoke">→ "PATHFINDER, plan DHL"</div>
-      </div>
-      <div class="agent-tile">
-        <div class="agent-callsign">RECON</div>
-        <div class="agent-name">Market Intelligence</div>
-        <div class="agent-role">Sector sweeps, signal synthesis, account research.</div>
-        <div class="agent-invoke">→ "RECON, sweep DHL news"</div>
-      </div>
-      <div class="agent-tile">
-        <div class="agent-callsign">ARCHITECT</div>
-        <div class="agent-name">OS Design</div>
-        <div class="agent-role">Builds and maintains this OS. Adds pages, updates tools.</div>
-        <div class="agent-invoke">→ "ARCHITECT, add a page"</div>
-      </div>
-      <div class="agent-tile">
-        <div class="agent-callsign">ORACLE</div>
-        <div class="agent-name">Prediction</div>
-        <div class="agent-role">Deal probability, scenario modelling, pattern spotting.</div>
-        <div class="agent-invoke">→ "ORACLE, score DHL risk"</div>
-      </div>
-      <div class="agent-tile">
-        <div class="agent-callsign">COMMS</div>
-        <div class="agent-name">Communications</div>
-        <div class="agent-role">Outreach, cold emails, follow-ups, LinkedIn messages.</div>
-        <div class="agent-invoke">→ "COMMS, draft DHL email"</div>
-      </div>
-      <div class="agent-tile">
-        <div class="agent-callsign">DEBRIEF</div>
-        <div class="agent-name">Wrap-ups</div>
-        <div class="agent-role">Call notes → actions, follow-up email, CRM log.</div>
-        <div class="agent-invoke">→ "DEBRIEF, summarise call"</div>
-      </div>
-      <div class="agent-tile">
-        <div class="agent-callsign">EDGE</div>
-        <div class="agent-name">Competitive Intel</div>
-        <div class="agent-role">Battlecards, competitor analysis, differentiation mapping.</div>
-        <div class="agent-invoke">→ "EDGE, DHL battlecard"</div>
-      </div>
-      <div class="agent-tile">
-        <div class="agent-callsign">COUNSEL</div>
-        <div class="agent-name">Legal &amp; Risk</div>
-        <div class="agent-role">Contract review, compliance flags, risk framing.</div>
-        <div class="agent-invoke">→ "COUNSEL, review clause"</div>
-      </div>
+    <div class="tiles tiles-4" style="gap:10px">
+      <div class="agent-tile"><div class="agent-callsign">Pathfinder</div><div class="agent-name">Strategic Navigator</div><div class="agent-role">Territory play, account prioritisation, where to go next.</div><div class="agent-invoke">→ "PATHFINDER, plan Network Rail"</div></div>
+      <div class="agent-tile"><div class="agent-callsign">RECON</div><div class="agent-name">Market Intelligence</div><div class="agent-role">Sector sweeps, signal synthesis, account research.</div><div class="agent-invoke">→ "RECON, sweep Network Rail"</div></div>
+      <div class="agent-tile"><div class="agent-callsign">ARCHITECT</div><div class="agent-name">OS Design</div><div class="agent-role">Builds and maintains this OS. Adds pages, updates tools.</div><div class="agent-invoke">→ "ARCHITECT, add a page"</div></div>
+      <div class="agent-tile"><div class="agent-callsign">ORACLE</div><div class="agent-name">Prediction</div><div class="agent-role">Deal probability, scenario modelling, pattern spotting.</div><div class="agent-invoke">→ "ORACLE, score NR deal risk"</div></div>
+      <div class="agent-tile"><div class="agent-callsign">COMMS</div><div class="agent-name">Communications</div><div class="agent-role">Outreach, cold emails, follow-ups, LinkedIn messages.</div><div class="agent-invoke">→ "COMMS, draft NR outreach"</div></div>
+      <div class="agent-tile"><div class="agent-callsign">DEBRIEF</div><div class="agent-name">Wrap-ups</div><div class="agent-role">Call notes → actions, follow-up email, CRM log.</div><div class="agent-invoke">→ "DEBRIEF, summarise call"</div></div>
+      <div class="agent-tile"><div class="agent-callsign">EDGE</div><div class="agent-name">Competitive Intel</div><div class="agent-role">Battlecards, competitor analysis, differentiation mapping.</div><div class="agent-invoke">→ "EDGE, NR battlecard"</div></div>
+      <div class="agent-tile"><div class="agent-callsign">COUNSEL</div><div class="agent-name">Legal &amp; Risk</div><div class="agent-role">Contract review, compliance flags, risk framing.</div><div class="agent-invoke">→ "COUNSEL, review clause"</div></div>
     </div>
   </div>
 
-  <!-- LAYER 5 · SECTORS -->
+  <!-- LAYER 5: SECTORS -->
   <div class="layer">
     <div class="layer-header">
       <div class="layer-num">5</div>
       <div class="layer-title">Sector Intelligence</div>
-      <div class="layer-desc">Baseline knowledge · UK-focused</div>
+      <div class="layer-desc">4 verticals · UK-focused baseline</div>
     </div>
-    <div class="tiles tiles-2">
-      <div class="tile">
-        <span class="tile-icon">🚚</span>
-        <div class="tile-title">Logistics &amp; Supply Chain</div>
-        <div class="tile-body">Fleet electrification · warehouse automation · HGV driver shortage · ESG reporting · 3PL market dynamics. Key accounts: DHL, XPO, Wincanton, GXO, Kuehne+Nagel.</div>
-      </div>
+    <div class="tiles tiles-4">
       <div class="tile">
         <span class="tile-icon">🚆</span>
-        <div class="tile-title">Rail &amp; Bus</div>
-        <div class="tile-body">ORR competency frameworks · Great British Railways transition · zero-emission bus ZEV mandate · frontline digital adoption · safety-critical compliance. Key accounts: Network Rail, TfL, FirstGroup, Go-Ahead, Arriva.</div>
+        <div class="tile-title">Rail</div>
+        <div class="tile-body">ORR competency frameworks · GBR transition · TOC reform · contractor workforce management · safety-critical compliance. 6 accounts.</div>
+      </div>
+      <div class="tile">
+        <span class="tile-icon">✈️</span>
+        <div class="tile-title">Aviation</div>
+        <div class="tile-body">CAA airside competency · security clearance management · high turnover post-COVID · terminal operations upskilling · airport infrastructure. 4 accounts.</div>
+      </div>
+      <div class="tile">
+        <span class="tile-icon">🛣️</span>
+        <div class="tile-title">Roads &amp; Ports</div>
+        <div class="tile-body">National Highways safety competency · port operator compliance · Transport Scotland digital transformation · DfT policy influence. 5 accounts.</div>
+      </div>
+      <div class="tile">
+        <span class="tile-icon">🏙️</span>
+        <div class="tile-title">Urban &amp; Services</div>
+        <div class="tile-body">TfL frontline workforce at scale · bus driver ZEV transition · facilities management compliance · multi-modal operations complexity. 2 accounts.</div>
       </div>
     </div>
   </div>
 
-</div><!-- /body -->
+</div>
 
-<!-- ── FOOTER ── -->
 <div class="footer">
-  <div>Cogna OS · Gareth · UK Territory · Architecture v1.0 · gareth@cogna.co</div>
+  <div>Cogna OS · Gareth · UK Territory · 17 Accounts · Architecture v2.0 · gareth@cogna.co</div>
   <div id="footer-date"></div>
 </div>
 
@@ -403,7 +324,7 @@ body{font-family:'Mona Sans','Inter',system-ui,sans-serif;background:var(--canva
 (function(){
   const d = new Date();
   const opts = {weekday:'long',day:'numeric',month:'long',year:'numeric'};
-  const str = d.toLocaleDateString('en-GB', opts);
+  const str = d.toLocaleDateString('en-GB',opts);
   document.getElementById('today-date').textContent = str;
   document.getElementById('footer-date').textContent = str;
 })();

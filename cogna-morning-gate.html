@@ -155,7 +155,7 @@ body{background:var(--forest-shade);color:white;display:flex;flex-direction:colu
     <a class="nav-link current" href="cogna-morning-gate.html">🌅 Morning Gate</a>
     <a class="nav-link" href="cogna-os-map.html">🗺️ OS Map</a>
     <a class="nav-link" href="gareth-command-centre.html">⚡ Command Centre</a>
-    <a class="nav-link" href="dhl-command-centre.html">📦 DHL</a>
+    <a class="nav-link" href="network-rail-command-centre.html">🚆 Network Rail</a>
   </div>
   <div class="nav-right" id="nav-date"></div>
 </div>
@@ -203,14 +203,14 @@ body{background:var(--forest-shade);color:white;display:flex;flex-direction:colu
         <div class="check-box">✓</div>
         <div>
           <div class="check-label">Triage RECON signals</div>
-          <div class="check-sub">Review latest DHL news sweep and any sector alerts</div>
+          <div class="check-sub">Review Territory News Sweep and any NR, Heathrow, TfL sector alerts</div>
         </div>
       </div>
       <div class="check-item" onclick="tick(this,2)">
         <div class="check-box">✓</div>
         <div>
-          <div class="check-label">Check active accounts</div>
-          <div class="check-sub">Any overnight news on DHL? Any signal that changes today's plan?</div>
+          <div class="check-label">Check Tier 1 accounts</div>
+          <div class="check-sub">Any overnight news on Network Rail, Heathrow or TfL? Any signal that changes today?</div>
         </div>
       </div>
       <div class="check-item" onclick="tick(this,3)">
@@ -268,24 +268,24 @@ body{background:var(--forest-shade);color:white;display:flex;flex-direction:colu
 
       <div class="account-row">
         <div class="account-left">
-          <div class="account-icon">📦</div>
+          <div class="account-icon">🚆</div>
           <div>
-            <div class="account-name"><span class="status-pip pip-active"></span>DHL Supply Chain UK</div>
-            <div class="account-stage">Pre-Discovery · EV Fleet trigger · 2026</div>
+            <div class="account-name"><span class="status-pip pip-active"></span>Network Rail</div>
+            <div class="account-stage">Tier 1 Active · ORR compliance + GBR transition</div>
           </div>
         </div>
         <div class="account-right">
-          <div class="account-score">19<span style="font-size:10px;font-weight:500;color:rgba(255,255,255,0.3)">/80</span></div>
+          <div class="account-score">24<span style="font-size:10px;font-weight:500;color:rgba(255,255,255,0.3)">/80</span></div>
           <div class="account-score-label">MEDDPICC</div>
         </div>
       </div>
 
-      <div class="account-row" style="opacity:0.5">
+      <div class="account-row" style="opacity:0.6">
         <div class="account-left">
-          <div class="account-icon">🚆</div>
+          <div class="account-icon">✈️</div>
           <div>
-            <div class="account-name"><span class="status-pip pip-target"></span>Network Rail</div>
-            <div class="account-stage">Target — RECON brief needed before outreach</div>
+            <div class="account-name"><span class="status-pip pip-target"></span>Heathrow Airport</div>
+            <div class="account-stage">Tier 1 Target · CAA compliance · airside workforce</div>
           </div>
         </div>
         <div class="account-right">
@@ -293,21 +293,17 @@ body{background:var(--forest-shade);color:white;display:flex;flex-direction:colu
         </div>
       </div>
 
-      <div class="account-row" style="opacity:0.5">
+      <div class="account-row" style="opacity:0.6">
         <div class="account-left">
-          <div class="account-icon">🚌</div>
+          <div class="account-icon">🏙️</div>
           <div>
-            <div class="account-name"><span class="status-pip pip-target"></span>FirstGroup</div>
-            <div class="account-stage">Target — ZEV mandate angle · L&D Director EB</div>
+            <div class="account-name"><span class="status-pip pip-target"></span>Transport for London</div>
+            <div class="account-stage">Tier 1 Target · ZEV bus mandate · 28k+ employees</div>
           </div>
         </div>
         <div class="account-right">
           <div class="account-score" style="font-size:11px;color:rgba(255,255,255,0.4)">Not started</div>
         </div>
-      </div>
-
-      <div class="add-account" onclick="promptAddAccount()">
-        <span style="font-size:16px">＋</span> Add account once confirmed
       </div>
     </div>
 
@@ -322,7 +318,7 @@ body{background:var(--forest-shade);color:white;display:flex;flex-direction:colu
       <div class="quick-grid">
         <a class="ql" href="cogna-os-map.html"><span class="ql-icon">🗺️</span> OS Map</a>
         <a class="ql" href="gareth-command-centre.html"><span class="ql-icon">⚡</span> Command Centre</a>
-        <a class="ql" href="dhl-command-centre.html"><span class="ql-icon">📦</span> DHL</a>
+        <a class="ql" href="network-rail-command-centre.html"><span class="ql-icon">🚆</span> Network Rail</a>
         <a class="ql" href="gareth-command-centre.html#sec-meddpicc"><span class="ql-icon">📊</span> MEDDPICC</a>
         <a class="ql" href="gareth-command-centre.html#sec-sectors"><span class="ql-icon">🏭</span> Sectors</a>
         <a class="ql" href="gareth-command-centre.html#sec-agents"><span class="ql-icon">🤖</span> Agents</a>
@@ -342,8 +338,8 @@ body{background:var(--forest-shade);color:white;display:flex;flex-direction:colu
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
           <div>
-            <div style="font-size:12px;font-weight:700;color:white">📦 DHL News Sweep</div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:1px">Daily · 9:00am · Slack DM</div>
+            <div style="font-size:12px;font-weight:700;color:white">🔍 Territory News Sweep</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:1px">Daily · 9:00am · NR, Heathrow, TfL → Slack DM</div>
           </div>
           <div style="width:7px;height:7px;border-radius:50%;background:#34C759;flex-shrink:0"></div>
         </div>
@@ -373,7 +369,7 @@ body{background:var(--forest-shade);color:white;display:flex;flex-direction:colu
   <div class="gate-complete-title">Gate cleared. You're loaded.</div>
   <div class="gate-complete-sub">All six checks done. Priorities set. Go close something.</div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
-    <a class="btn btn-purple" href="dhl-command-centre.html">📦 Open DHL Command Centre</a>
+    <a class="btn btn-purple" href="network-rail-command-centre.html">🚆 Open Network Rail Command Centre</a>
     <a class="btn btn-ghost" href="gareth-command-centre.html">⚡ Command Centre</a>
     <button class="btn btn-ghost" onclick="resetGate()">↺ Reset</button>
   </div>
@@ -383,11 +379,11 @@ body{background:var(--forest-shade);color:white;display:flex;flex-direction:colu
 <div class="agents-strip" id="agents-strip">
   <div class="agents-label">Invoke an agent</div>
   <div class="agents-row">
-    <div class="agent-chip" onclick="selectAgent(this,'PATHFINDER','plan the DHL territory play')">⚓ PATHFINDER</div>
-    <div class="agent-chip" onclick="selectAgent(this,'RECON','sweep DHL UK for executive news')">📡 RECON</div>
-    <div class="agent-chip" onclick="selectAgent(this,'COMMS','draft DHL cold outreach — EV angle')">✉️ COMMS</div>
-    <div class="agent-chip" onclick="selectAgent(this,'ORACLE','score DHL deal risk and next best action')">🔮 ORACLE</div>
-    <div class="agent-chip" onclick="selectAgent(this,'EDGE','who is DHL\\'s likely incumbent LMS vendor')">⚔️ EDGE</div>
+    <div class="agent-chip" onclick="selectAgent(this,'PATHFINDER','plan the Network Rail territory play')">⚓ PATHFINDER</div>
+    <div class="agent-chip" onclick="selectAgent(this,'RECON','sweep Network Rail for executive news and ORR signals')">📡 RECON</div>
+    <div class="agent-chip" onclick="selectAgent(this,'COMMS','draft Network Rail cold outreach — ORR compliance angle')">✉️ COMMS</div>
+    <div class="agent-chip" onclick="selectAgent(this,'ORACLE','score Network Rail deal risk and next best action')">🔮 ORACLE</div>
+    <div class="agent-chip" onclick="selectAgent(this,'EDGE','who is Network Rail\\'s likely incumbent competency system')">⚔️ EDGE</div>
     <div class="agent-chip" onclick="selectAgent(this,'DEBRIEF','summarise my last call notes')">📝 DEBRIEF</div>
     <div class="agent-chip" onclick="selectAgent(this,'ARCHITECT','what should I build next in the OS')">🧱 ARCHITECT</div>
     <div class="agent-chip" onclick="selectAgent(this,'COUNSEL','review this contract clause')">⚖️ COUNSEL</div>

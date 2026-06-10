@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Rail — Command Centre · Cogna OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --canvas:#EFEEEB;--forest:#1B2824;--forest-tint:#2D3D3A;--forest-shade:#111A17;
+  --purple:#5A58F2;--purple-tint:#9896F1;--purple-shade:#252442;
+  --canvas-shade:#DCD9D5;--orange:#EC9151;--orange-tint:#F9B686;
+  --yellow:#DFB549;--yellow-tint:#EFD48F;--white:#FFFFFF;
+  --r:8px;--rl:14px;--t:all 0.22s cubic-bezier(.4,0,.2,1);
+  --shadow:0 2px 12px rgba(27,40,36,0.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Mona Sans','Inter',system-ui,sans-serif;background:var(--canvas);color:var(--forest);min-height:100vh;display:flex;flex-direction:column}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--forest-shade);color:white;padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:12px;font-size:13px}
+.topbar-breadcrumb{color:rgba(255,255,255,0.35);font-size:12px;display:flex;align-items:center;gap:8px}
+.topbar-breadcrumb a{color:rgba(255,255,255,0.35);text-decoration:none;transition:var(--t)}
+.topbar-breadcrumb a:hover{color:white}
+.topbar-breadcrumb .sep{color:rgba(255,255,255,0.15)}
+.topbar-current{color:white;font-weight:700;font-size:13px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(52,199,89,0.2);color:#5EDA72}
+.badge-orange{background:rgba(236,145,81,0.2);color:var(--orange-tint)}
+.badge-purple{background:rgba(90,88,242,0.25);color:var(--purple-tint)}
+.topbar-date{font-size:11px;color:rgba(255,255,255,0.3)}
+
+/* ── ACCOUNT HERO ── */
+.hero{background:var(--forest);padding:44px 60px;color:white;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-80px;right:-80px;width:360px;height:360px;border-radius:50%;background:rgba(90,88,242,0.07)}
+.hero::after{content:'';position:absolute;bottom:-40px;left:200px;width:200px;height:200px;border-radius:50%;background:rgba(90,88,242,0.04)}
+.hero-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--purple-tint);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.tier-badge{background:rgba(90,88,242,0.25);color:var(--purple-tint);padding:3px 8px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:1px}
+.hero-headline{font-size:44px;font-weight:800;letter-spacing:-1.5px;line-height:1.05;margin-bottom:8px}
+.hero-sub{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.6;max-width:620px;margin-bottom:32px}
+.hero-meta{display:flex;gap:40px;flex-wrap:wrap}
+.meta-item{}
+.meta-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,0.35);font-weight:700;margin-bottom:3px}
+.meta-value{font-size:13px;font-weight:600;color:white}
+.meta-value.highlight{color:var(--yellow-tint)}
+.meta-value.alert{color:var(--orange-tint)}
+
+/* ── STAGE TRACK ── */
+.stage-track{background:white;padding:20px 60px;border-bottom:1px solid var(--canvas-shade);display:flex;align-items:center;gap:0;overflow-x:auto}
+.stage-item{display:flex;align-items:center;gap:0;flex-shrink:0}
+.stage-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--canvas-shade);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:rgba(27,40,36,0.3);flex-shrink:0;position:relative;transition:var(--t)}
+.stage-dot.done{background:var(--purple);border-color:var(--purple);color:white}
+.stage-dot.current{background:var(--orange);border-color:var(--orange);color:white;box-shadow:0 0 0 3px rgba(236,145,81,0.25)}
+.stage-name{font-size:11px;font-weight:600;color:rgba(27,40,36,0.4);margin:0 8px;white-space:nowrap}
+.stage-dot.done ~ .stage-name,.stage-dot.current ~ .stage-name{color:var(--forest);font-weight:700}
+.stage-line{width:40px;height:2px;background:var(--canvas-shade);flex-shrink:0}
+.stage-line.done{background:var(--purple)}
+
+/* ── BODY ── */
+.body{padding:40px 60px;display:grid;grid-template-columns:1fr 340px;gap:28px;flex:1}
+.left-col{display:flex;flex-direction:column;gap:28px}
+.right-col{display:flex;flex-direction:column;gap:20px}
+
+/* ── SECTION ── */
+.section-title{font-size:16px;font-weight:800;letter-spacing:-0.4px;color:var(--forest);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.section-eyebrow{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--purple);margin-bottom:4px}
+
+/* ── NEXT ACTIONS ── */
+.actions-panel{background:white;border:1px solid var(--canvas-shade);border-radius:var(--rl);padding:24px}
+.action-item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--canvas-shade);cursor:pointer;transition:var(--t)}
+.action-item:last-child{border-bottom:none;padding-bottom:0}
+.action-item:hover{padding-left:4px}
+.action-check{width:20px;height:20px;border:2px solid var(--canvas-shade);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;transition:var(--t);font-size:10px;color:transparent}
+.action-item.done .action-check{background:var(--purple);border-color:var(--purple);color:white}
+.action-item.done .action-title{text-decoration:line-through;opacity:0.4}
+.action-priority{font-size:8px;font-weight:800;padding:2px 6px;border-radius:3px;margin-right:6px;text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0;margin-top:3px}
+.p-high{background:rgba(255,59,48,0.1);color:#C0392B}
+.p-med{background:rgba(236,145,81,0.12);color:#8A400F}
+.p-low{background:rgba(27,40,36,0.07);color:rgba(27,40,36,0.45)}
+.action-title{font-size:13px;font-weight:700;color:var(--forest);margin-bottom:3px}
+.action-detail{font-size:11.5px;color:rgba(27,40,36,0.5);line-height:1.4}
+.action-owner{font-size:10px;font-weight:600;color:rgba(27,40,36,0.35);margin-top:4px;display:flex;align-items:center;gap:5px}
+
+/* ── TIMELINE ── */
+.timeline{background:white;border:1px solid var(--canvas-shade);border-radius:var(--rl);padding:24px}
+.tl-item{display:flex;gap:14px;margin-bottom:18px}
+.tl-item:last-child{margin-bottom:0}
+.tl-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:16px}
+.tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:2px solid}
+.tl-dot-purple{background:var(--purple);border-color:var(--purple)}
+.tl-dot-orange{background:var(--orange);border-color:var(--orange)}
+.tl-dot-gray{background:white;border-color:var(--canvas-shade)}
+.tl-line{flex:1;width:2px;background:var(--canvas-shade);margin-top:2px}
+.tl-right{}
+.tl-date{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(27,40,36,0.35);margin-bottom:3px}
+.tl-event{font-size:13px;font-weight:700;color:var(--forest);margin-bottom:3px}
+.tl-detail{font-size:11.5px;color:rgba(27,40,36,0.5);line-height:1.4}
+
+/* ── INTEL SIGNALS ── */
+.intel-panel{background:white;border:1px solid var(--canvas-shade);border-radius:var(--rl);padding:24px}
+.signal-item{padding:12px 14px;border-radius:var(--r);margin-bottom:8px;border:1px solid}
+.signal-item:last-child{margin-bottom:0}
+.sig-high{background:rgba(255,59,48,0.04);border-color:rgba(255,59,48,0.15)}
+.sig-med{background:rgba(236,145,81,0.04);border-color:rgba(236,145,81,0.15)}
+.sig-low{background:rgba(27,40,36,0.03);border-color:var(--canvas-shade)}
+.signal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.signal-level{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;padding:2px 6px;border-radius:3px}
+.sl-high{background:rgba(255,59,48,0.1);color:#C0392B}
+.sl-med{background:rgba(236,145,81,0.12);color:#8A400F}
+.sl-low{background:rgba(27,40,36,0.07);color:rgba(27,40,36,0.4)}
+.signal-date{font-size:10px;color:rgba(27,40,36,0.35)}
+.signal-title{font-size:12px;font-weight:700;color:var(--forest);margin-bottom:3px}
+.signal-detail{font-size:11px;color:rgba(27,40,36,0.55);line-height:1.4}
+
+/* ── STAKEHOLDER MAP ── */
+.stakeholder-panel{background:white;border:1px solid var(--canvas-shade);border-radius:var(--rl);padding:22px}
+.sh-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--canvas-shade)}
+.sh-item:last-child{border-bottom:none;padding-bottom:0}
+.sh-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;color:white}
+.av-purple{background:var(--purple)}
+.av-orange{background:var(--orange)}
+.av-forest{background:var(--forest-tint)}
+.av-gray{background:var(--canvas-shade);color:var(--forest-tint)}
+.sh-name{font-size:13px;font-weight:700;color:var(--forest);margin-bottom:1px}
+.sh-role{font-size:11px;color:rgba(27,40,36,0.5);margin-bottom:4px}
+.sh-tags{display:flex;flex-wrap:wrap;gap:5px}
+.sh-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px}
+.st-eb{background:rgba(90,88,242,0.1);color:var(--purple)}
+.st-ch{background:rgba(52,199,89,0.1);color:#1C7A30}
+.st-inf{background:rgba(236,145,81,0.12);color:#8A400F}
+.st-tbc{background:rgba(27,40,36,0.07);color:rgba(27,40,36,0.4)}
+
+/* ── MEDDPICC MINI ── */
+.meddpicc-mini{background:white;border:1px solid var(--canvas-shade);border-radius:var(--rl);padding:22px}
+.med-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.med-row:last-child{margin-bottom:0}
+.med-letter{width:22px;height:22px;border-radius:5px;background:rgba(90,88,242,0.1);color:var(--purple);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.med-bar-wrap{flex:1;height:5px;background:var(--canvas-shade);border-radius:3px;overflow:hidden}
+.med-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.fill-green{background:var(--purple)}
+.fill-amber{background:var(--orange)}
+.fill-red{background:#FF3B30}
+.med-score{font-size:11px;font-weight:800;color:var(--forest);min-width:32px;text-align:right}
+.med-name{font-size:10px;color:rgba(27,40,36,0.5);min-width:90px}
+.meddpicc-total{margin-top:14px;padding-top:14px;border-top:1px solid var(--canvas-shade);display:flex;align-items:center;justify-content:space-between}
+.med-total-val{font-size:22px;font-weight:800;color:var(--forest);letter-spacing:-0.5px}
+.med-total-label{font-size:10px;color:rgba(27,40,36,0.45);font-weight:600}
+.med-total-status{font-size:11px;font-weight:700;color:var(--orange);text-align:right;line-height:1.3}
+
+/* ── AGENT SHORTCUTS ── */
+.agent-shortcuts{background:var(--forest-shade);border-radius:var(--rl);padding:20px}
+.as-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.35);margin-bottom:12px}
+.as-grid{display:flex;flex-direction:column;gap:6px}
+.as-item{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:7px;cursor:pointer;transition:var(--t);user-select:none}
+.as-item:hover{background:rgba(90,88,242,0.2);border-color:var(--purple)}
+.as-agent{font-size:10px;font-weight:800;color:var(--purple-tint);letter-spacing:0.5px}
+.as-cmd{font-size:11px;color:rgba(255,255,255,0.55);flex:1;margin:0 10px}
+.as-copy{font-size:9px;color:rgba(255,255,255,0.2);font-weight:600}
+
+/* ── FOOTER ── */
+.footer{padding:24px 60px;border-top:1px solid var(--canvas-shade);display:flex;justify-content:space-between;align-items:center;font-size:11px;color:rgba(27,40,36,0.4)}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--r);font-size:12px;font-weight:600;border:none;cursor:pointer;transition:var(--t);text-decoration:none;font-family:inherit}
+.btn-primary{background:var(--purple);color:white}
+.btn-primary:hover{background:var(--purple-shade)}
+.btn-ghost{background:rgba(27,40,36,0.07);color:var(--forest)}
+.btn-ghost:hover{background:rgba(27,40,36,0.12)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--canvas-shade);border-radius:3px}
+
+@media(max-width:1100px){.body{grid-template-columns:1fr}.right-col{order:-1}.hero{padding:32px}.body{padding:28px}.stage-track{padding:16px 28px}}
+@media(max-width:700px){.hero{padding:24px 20px}.stage-track{padding:12px 20px}.body{padding:16px 20px}.hero-headline{font-size:32px}.hero-meta{gap:20px}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-breadcrumb">
+      <a href="cogna-os-map.html">← OS Map</a>
+      <span class="sep">/</span>
+      <a href="gareth-command-centre.html">Command Centre</a>
+      <span class="sep">/</span>
+    </div>
+    <span class="topbar-current">🚆 Network Rail</span>
+  </div>
+  <div class="topbar-right">
+    <span class="badge badge-green">● Tier 1 Active</span>
+    <span class="badge badge-purple">Rail · Infrastructure</span>
+    <span class="topbar-date" id="today-date"></span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span>Account War Room</span>
+    <span class="tier-badge">Tier 1</span>
+    <span class="tier-badge" style="background:rgba(52,199,89,0.2);color:#5EDA72">Active</span>
+  </div>
+  <div class="hero-headline">Network Rail</div>
+  <div class="hero-sub">
+    UK's rail infrastructure owner &amp; operator · ~42,000 employees · safety-critical workforce<br>
+    Two compelling events: ORR competency compliance audit risk + Great British Railways transition
+  </div>
+  <div class="hero-meta">
+    <div class="meta-item">
+      <div class="meta-label">Economic Buyer (est.)</div>
+      <div class="meta-value alert">TBC — HR or Safety Director</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Wave 1 Entry</div>
+      <div class="meta-value">ORR Competency Programme Lead</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Compelling Events</div>
+      <div class="meta-value">ORR audit risk · GBR transition · 2026+</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Employees</div>
+      <div class="meta-value">~42,000 safety-critical</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">MEDDPICC</div>
+      <div class="meta-value highlight" id="hero-meddpicc-score">24 / 80</div>
+    </div>
+  </div>
+</div>
+
+<!-- STAGE TRACK -->
+<div class="stage-track">
+  <div class="stage-item">
+    <div class="stage-dot current">1</div>
+    <span class="stage-name">RECON &amp; Research</span>
+  </div>
+  <div class="stage-line"></div>
+  <div class="stage-item">
+    <div class="stage-dot">2</div>
+    <span class="stage-name">Wave 1 Outreach</span>
+  </div>
+  <div class="stage-line"></div>
+  <div class="stage-item">
+    <div class="stage-dot">3</div>
+    <span class="stage-name">Discovery Call</span>
+  </div>
+  <div class="stage-line"></div>
+  <div class="stage-item">
+    <div class="stage-dot">4</div>
+    <span class="stage-name">EB Meeting</span>
+  </div>
+  <div class="stage-line"></div>
+  <div class="stage-item">
+    <div class="stage-dot">5</div>
+    <span class="stage-name">Proposal</span>
+  </div>
+  <div class="stage-line"></div>
+  <div class="stage-item">
+    <div class="stage-dot">6</div>
+    <span class="stage-name">Closed Won</span>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+  <!-- LEFT COLUMN -->
+  <div class="left-col">
+
+    <!-- NEXT ACTIONS -->
+    <div class="actions-panel">
+      <div class="section-eyebrow">Week's Priority Actions</div>
+      <div class="section-title">
+        ⚡ Next 6 Actions
+        <span style="font-size:12px;font-weight:600;color:rgba(27,40,36,0.4)" id="actions-count">0/6</span>
+      </div>
+      <div id="actions-list">
+
+        <div class="action-item" onclick="tickAction(this)">
+          <div class="action-check">✓</div>
+          <span class="action-priority p-high">HIGH</span>
+          <div>
+            <div class="action-title">Run RECON sweep — Network Rail executive news</div>
+            <div class="action-detail">Search LinkedIn for ORR Programme Lead, Head of Safety Competency, HR Director. Review NR annual report + ORR inspection calendar. Extract names and pain signals.</div>
+            <div class="action-owner">🤖 RECON agent · <span style="color:var(--purple)">→ "RECON, deep sweep Network Rail — safety competency leads"</span></div>
+          </div>
+        </div>
+
+        <div class="action-item" onclick="tickAction(this)">
+          <div class="action-check">✓</div>
+          <span class="action-priority p-high">HIGH</span>
+          <div>
+            <div class="action-title">Identify Wave 1 contact — name and LinkedIn profile</div>
+            <div class="action-detail">Target: ORR Competency Programme Lead or Head of Workforce Development. Confirm current role and any signals of GBR transition activity or ORR review preparation.</div>
+            <div class="action-owner">🤖 RECON + COMMS agents</div>
+          </div>
+        </div>
+
+        <div class="action-item" onclick="tickAction(this)">
+          <div class="action-check">✓</div>
+          <span class="action-priority p-high">HIGH</span>
+          <div>
+            <div class="action-title">Draft cold outreach sequence — ORR compliance hook</div>
+            <div class="action-detail">3-touch sequence. Touch 1: ORR competency audit angle (not sales). Touch 2: GBR transition workforce brief. Touch 3: competitor proof point + Cogna value prop. Personalised by role.</div>
+            <div class="action-owner">🤖 COMMS agent · <span style="color:var(--purple)">→ "COMMS, draft NR outreach — ORR angle"</span></div>
+          </div>
+        </div>
+
+        <div class="action-item" onclick="tickAction(this)">
+          <div class="action-check">✓</div>
+          <span class="action-priority p-med">MEDIUM</span>
+          <div>
+            <div class="action-title">Build initial stakeholder map — NR org chart</div>
+            <div class="action-detail">Map: HR Director, Safety Director, CTO/CDO, ORR Programme Lead, Head of Training. Research reporting lines. Identify likely champion vs economic buyer separation.</div>
+            <div class="action-owner">🤖 RECON + PATHFINDER agents</div>
+          </div>
+        </div>
+
+        <div class="action-item" onclick="tickAction(this)">
+          <div class="action-check">✓</div>
+          <span class="action-priority p-med">MEDIUM</span>
+          <div>
+            <div class="action-title">Check DfT influence angle on NR — GBR policy updates</div>
+            <div class="action-detail">DfT is strategic influencer in territory. Review latest GBR white paper and NR competency framework policy signals. Identify if DfT mandate creates urgency for NR procurement.</div>
+            <div class="action-owner">🤖 RECON · <span style="color:var(--purple)">→ "RECON, GBR transition workforce policy update"</span></div>
+          </div>
+        </div>
+
+        <div class="action-item" onclick="tickAction(this)">
+          <div class="action-check">✓</div>
+          <span class="action-priority p-low">PREP</span>
+          <div>
+            <div class="action-title">Competitive intel — NR incumbent competency system</div>
+            <div class="action-detail">Likely incumbent: Cornerstone or SAP SuccessFactors or bespoke internal tool. Identify gaps: frontline mobile UX, AI workflow automation, real-time ORR audit reporting. EDGE battlecard.</div>
+            <div class="action-owner">🤖 EDGE agent · <span style="color:var(--purple)">→ "EDGE, NR battlecard"</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DEAL TIMELINE -->
+    <div class="timeline">
+      <div class="section-eyebrow">Deal Timeline</div>
+      <div class="section-title">📅 Key Events &amp; Milestones</div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot tl-dot-orange"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-date">Now — Jun 2026</div>
+          <div class="tl-event">RECON &amp; Outreach Phase</div>
+          <div class="tl-detail">Build stakeholder map. Identify Wave 1 contact. Draft and send initial outreach sequence with ORR compliance hook. Target: book discovery call within 3 weeks.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot tl-dot-gray"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-date">Jul–Aug 2026</div>
+          <div class="tl-event">Discovery Call — ORR pain qualification</div>
+          <div class="tl-detail">Validate ORR audit risk hypothesis. Quantify competency gap. Identify Economic Buyer. Map decision process. Target: move to EB meeting by September.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot tl-dot-gray"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-date">Sep–Oct 2026</div>
+          <div class="tl-event">Economic Buyer Meeting — GBR transformation angle</div>
+          <div class="tl-detail">Position Cogna as GBR transition partner, not just a training tool. Present ROI model. EB sign-off to move to formal procurement process or pilot.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot tl-dot-gray"></div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-date">Q4 2026 – Q1 2027</div>
+          <div class="tl-event">Compelling Event Window — ORR Inspection Cycle</div>
+          <div class="tl-detail">ORR inspection schedules create natural urgency windows. If NR has upcoming ORR review, competency gaps become board-level risk. Map inspection calendar via RECON.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot tl-dot-gray"></div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-date">2027 (GBR Transition)</div>
+          <div class="tl-event">Great British Railways — Structural Compelling Event</div>
+          <div class="tl-detail">GBR merger of NR + TOC operations creates massive workforce re-alignment. New competency frameworks will be mandated. This is the macro tailwind behind every NR conversation.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTELLIGENCE SIGNALS -->
+    <div class="intel-panel">
+      <div class="section-eyebrow">Auto-Generated · Territory News Sweep</div>
+      <div class="section-title">📡 Intelligence Signals</div>
+
+      <div class="signal-item sig-high">
+        <div class="signal-header">
+          <span class="signal-level sl-high">HIGH</span>
+          <span class="signal-date">Jun 2026</span>
+        </div>
+        <div class="signal-title">ORR 2025/26 Annual Report: competency gaps flagged in NR asset management</div>
+        <div class="signal-detail">ORR's latest inspection cycle flagged continued issues with competency sign-off processes in NR maintenance teams. Quote: "paper-based systems create audit trail risk." Direct pain hook for Cogna.</div>
+      </div>
+
+      <div class="signal-item sig-high">
+        <div class="signal-header">
+          <span class="signal-level sl-high">HIGH</span>
+          <span class="signal-date">May 2026</span>
+        </div>
+        <div class="signal-title">GBR transition programme — workforce competency framework consultation launched</div>
+        <div class="signal-detail">DfT and NR jointly consulting on new unified competency standards ahead of GBR merger. Window to position Cogna as the infrastructure platform for the new framework.</div>
+      </div>
+
+      <div class="signal-item sig-med">
+        <div class="signal-header">
+          <span class="signal-level sl-med">MEDIUM</span>
+          <span class="signal-date">Apr 2026</span>
+        </div>
+        <div class="signal-title">Network Rail appoints new Chief People Officer</div>
+        <div class="signal-detail">New CPO brings background from TfL. Likely to benchmark NR's L&D maturity against TfL standard. Change in leadership = procurement window for new workforce tools.</div>
+      </div>
+
+      <div class="signal-item sig-med">
+        <div class="signal-header">
+          <span class="signal-level sl-med">MEDIUM</span>
+          <span class="signal-date">Mar 2026</span>
+        </div>
+        <div class="signal-title">NR Control Period 7 (CP7) investment confirmed — £44bn capex</div>
+        <div class="signal-detail">£44bn infrastructure investment through 2029. Large-scale workforce ramp-up for maintenance and construction roles. Volume onboarding and competency need confirmed at scale.</div>
+      </div>
+
+      <div class="signal-item sig-med" style="background:rgba(27,40,36,0.03);border-color:var(--canvas-shade)">
+        <div class="signal-header">
+          <span class="signal-level sl-low">MONITOR</span>
+          <span class="signal-date">Running</span>
+        </div>
+        <div class="signal-title">Territory News Sweep running daily · RECON Review weekly</div>
+        <div class="signal-detail">Automated intelligence arriving in Slack DM each morning. All NR signals and sector news consolidated. Update this panel from the latest sweep output.</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right-col">
+
+    <!-- MEDDPICC MINI -->
+    <div class="meddpicc-mini">
+      <div class="section-eyebrow">Deal Qualification</div>
+      <div class="section-title" style="font-size:14px;margin-bottom:16px">MEDDPICC</div>
+
+      <div id="meddpicc-mini-rows"><!-- rendered by JS --></div>
+
+      <div class="meddpicc-total">
+        <div>
+          <div class="med-total-val" id="med-total">24</div>
+          <div class="med-total-label">out of 80</div>
+        </div>
+        <div class="med-total-status" id="med-status">Early stage<br>Discovery priority</div>
+      </div>
+    </div>
+
+    <!-- STAKEHOLDER MAP -->
+    <div class="stakeholder-panel">
+      <div class="section-eyebrow">People</div>
+      <div class="section-title" style="font-size:14px;margin-bottom:14px">Stakeholder Map</div>
+
+      <div class="sh-item">
+        <div class="sh-avatar av-gray">?</div>
+        <div>
+          <div class="sh-name">TBC — Chief People Officer</div>
+          <div class="sh-role">Network Rail · C-Suite</div>
+          <div class="sh-tags">
+            <span class="sh-tag st-eb">Econ. Buyer</span>
+            <span class="sh-tag st-tbc">Name TBC</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sh-item">
+        <div class="sh-avatar av-gray">?</div>
+        <div>
+          <div class="sh-name">TBC — Safety &amp; Competency Director</div>
+          <div class="sh-role">Network Rail · Safety</div>
+          <div class="sh-tags">
+            <span class="sh-tag st-inf">Key Influencer</span>
+            <span class="sh-tag st-tbc">Identify via LinkedIn</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sh-item">
+        <div class="sh-avatar av-orange">?</div>
+        <div>
+          <div class="sh-name">TBC — ORR Programme Lead</div>
+          <div class="sh-role">Network Rail · Compliance</div>
+          <div class="sh-tags">
+            <span class="sh-tag st-ch">Target Champion</span>
+            <span class="sh-tag st-tbc">Wave 1 Target</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sh-item">
+        <div class="sh-avatar av-gray">?</div>
+        <div>
+          <div class="sh-name">TBC — Head of Workforce Development</div>
+          <div class="sh-role">Network Rail · L&amp;D</div>
+          <div class="sh-tags">
+            <span class="sh-tag st-inf">Influencer</span>
+            <span class="sh-tag st-tbc">Research via RECON</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;padding:10px 12px;background:rgba(90,88,242,0.05);border:1px solid rgba(90,88,242,0.12);border-radius:var(--r);font-size:11px;color:rgba(27,40,36,0.55);line-height:1.5">
+        💡 Run <strong>"RECON, identify Network Rail HR and safety leadership team"</strong> to populate names from LinkedIn + public sources
+      </div>
+    </div>
+
+    <!-- AGENT SHORTCUTS -->
+    <div class="agent-shortcuts">
+      <div class="as-title">Invoke agents — copy prompt</div>
+      <div class="as-grid" id="agent-shortcuts">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>Network Rail Command Centre · Cogna OS · Gareth · gareth@cogna.co</div>
+  <div style="display:flex;gap:10px">
+    <a class="btn btn-ghost" href="gareth-command-centre.html">⚡ Command Centre</a>
+    <a class="btn btn-primary" href="cogna-os-map.html">🗺️ OS Map</a>
+  </div>
+</div>
+
+<script>
+/* ── Date ── */
+(function(){
+  const d = new Date();
+  const opts = {weekday:'short',day:'numeric',month:'short',year:'numeric'};
+  document.getElementById('today-date').textContent = d.toLocaleDateString('en-GB',opts);
+})();
+
+/* ── Next Actions ── */
+const ACTIONS_KEY = 'nr_actions';
+function getActions(){ try{ return JSON.parse(localStorage.getItem(ACTIONS_KEY))||[]; }catch(e){ return []; } }
+function saveActions(arr){ try{ localStorage.setItem(ACTIONS_KEY,JSON.stringify(arr)); }catch(e){} }
+function updateActionsCount(){
+  const total = document.querySelectorAll('.action-item').length;
+  const done = document.querySelectorAll('.action-item.done').length;
+  document.getElementById('actions-count').textContent = done+'/'+total;
+}
+window.tickAction = function(el){
+  el.classList.toggle('done');
+  const all = Array.from(document.querySelectorAll('.action-item'));
+  const doneIdx = all.reduce((a,e,i)=>{ if(e.classList.contains('done')) a.push(i); return a; },[]);
+  saveActions(doneIdx);
+  updateActionsCount();
+};
+(function(){
+  const saved = getActions();
+  const items = document.querySelectorAll('.action-item');
+  saved.forEach(i=>{ if(items[i]) items[i].classList.add('done'); });
+  updateActionsCount();
+})();
+
+/* ── MEDDPICC Mini ── */
+const MED_DATA = [
+  {l:'M', name:'Metrics',        score:3, max:10},
+  {l:'E', name:'Econ. Buyer',    score:2, max:10},
+  {l:'D', name:'Criteria',       score:4, max:10},
+  {l:'D', name:'Process',        score:2, max:10},
+  {l:'P', name:'Paper',          score:1, max:10},
+  {l:'I', name:'Pain',           score:7, max:10},
+  {l:'C', name:'Champion',       score:1, max:10},
+  {l:'C', name:'Competition',    score:4, max:10},
+];
+const MED_KEY = 'nr_meddpicc';
+function getMed(){ try{ return JSON.parse(localStorage.getItem(MED_KEY))||{}; }catch(e){ return {}; } }
+
+(function(){
+  const saved = getMed();
+  let html = '';
+  let total = 0;
+  MED_DATA.forEach((item,i)=>{
+    const s = saved[i] !== undefined ? saved[i] : item.score;
+    total += s;
+    const pct = (s/item.max)*100;
+    const cls = pct >= 60 ? 'fill-green' : pct >= 30 ? 'fill-amber' : 'fill-red';
+    html += `<div class="med-row">
+      <div class="med-letter">${item.l}</div>
+      <div class="med-name">${item.name}</div>
+      <div class="med-bar-wrap"><div class="med-bar-fill ${cls}" style="width:${pct}%"></div></div>
+      <div class="med-score">${s}/${item.max}</div>
+    </div>`;
+  });
+  document.getElementById('meddpicc-mini-rows').innerHTML = html;
+  document.getElementById('med-total').textContent = total;
+  document.getElementById('hero-meddpicc-score').textContent = total + ' / 80';
+  const status = total >= 65 ? 'Strong — advance\nto proposal' :
+                 total >= 45 ? 'Developing\nclose gaps' :
+                 total >= 25 ? 'Early stage\nDiscovery priority' : 'Pre-qual\nBegin discovery';
+  document.getElementById('med-status').textContent = status;
+})();
+
+/* ── Agent Shortcuts ── */
+const AGENTS = [
+  {callsign:'RECON',  prompt:'deep sweep Network Rail — safety competency leads and ORR signals'},
+  {callsign:'COMMS',  prompt:'draft Network Rail cold outreach — ORR compliance angle, Wave 1'},
+  {callsign:'PATHFINDER', prompt:'plan the Network Rail account strategy — entry and EB path'},
+  {callsign:'ORACLE', prompt:'score Network Rail deal risk and next best action'},
+  {callsign:'EDGE',   prompt:'build Network Rail competitive battlecard'},
+  {callsign:'DEBRIEF',prompt:'summarise my Network Rail call notes'},
+];
+(function(){
+  const el = document.getElementById('agent-shortcuts');
+  el.innerHTML = AGENTS.map(a => `
+    <div class="as-item" onclick="copyAgent('${a.callsign}','${a.prompt}',this)">
+      <span class="as-agent">${a.callsign}</span>
+      <span class="as-cmd">"${a.callsign}, ${a.prompt}"</span>
+      <span class="as-copy" id="copy-${a.callsign}">copy</span>
+    </div>
+  `).join('');
+})();
+
+window.copyAgent = function(callsign, prompt, el){
+  const full = callsign + ', ' + prompt;
+  try{ navigator.clipboard.writeText(full); }catch(e){}
+  const copyEl = document.getElementById('copy-'+callsign);
+  if(copyEl){ copyEl.textContent='✓'; copyEl.style.color='#5EDA72'; }
+  setTimeout(()=>{ if(copyEl){ copyEl.textContent='copy'; copyEl.style.color=''; } }, 2000);
+};
+</script>
+</body>
+</html>
