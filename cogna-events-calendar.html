@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Events Calendar 2026 — Cogna OS Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --canvas: #EFEEEB;
+    --forest: #1B2824;
+    --forest-tint: #2D3D3A;
+    --forest-shade: #111A17;
+    --purple: #5A58F2;
+    --purple-tint: #9896F1;
+    --purple-shade: #252442;
+    --canvas-shade: #DCD9D5;
+    --orange: #EC9151;
+    --orange-tint: #F9B686;
+    --yellow: #DFB549;
+    --yellow-tint: #EFD48F;
+    --white: #FFFFFF;
+    --green: #2E7D4F;
+    --green-light: #D4EDDA;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Mona Sans', 'Inter', system-ui, sans-serif;
+    background: var(--canvas);
+    color: var(--forest);
+    min-height: 100vh;
+    padding-bottom: 72px;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--forest-shade);
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+  }
+  .topbar-left span { color: rgba(255,255,255,0.85); }
+  .topbar-left .arrow { color: rgba(255,255,255,0.35); }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .badge-green {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(46,125,79,0.22);
+    color: #6FD9A0;
+    border: 1px solid rgba(111,217,160,0.25);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .badge-green .dot {
+    width: 6px; height: 6px;
+    background: #6FD9A0;
+    border-radius: 50%;
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+  @keyframes pulse-green {
+    0%,100% { opacity:1; } 50% { opacity:0.4; }
+  }
+  .topbar-date {
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--forest);
+    padding: 36px 60px 32px;
+    color: var(--white);
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--purple-tint);
+    margin-bottom: 10px;
+  }
+  .hero-headline {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .hero-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    max-width: 680px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 0;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    width: fit-content;
+  }
+  .stat-item {
+    padding: 14px 28px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    display: block;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* ── ALERT BANNER ── */
+  .alert-banner {
+    background: var(--orange);
+    color: var(--forest-shade);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13.5px;
+    font-weight: 600;
+    gap: 16px;
+  }
+  .alert-banner.hidden { display: none; }
+  .alert-dismiss {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--forest-shade);
+    font-size: 18px;
+    line-height: 1;
+    opacity: 0.6;
+    flex-shrink: 0;
+    padding: 0 4px;
+    transition: opacity 0.15s;
+  }
+  .alert-dismiss:hover { opacity: 1; }
+  .alert-banner a { color: var(--forest-shade); font-weight: 700; }
+
+  /* ── FILTER BAR ── */
+  .filterbar {
+    position: sticky;
+    top: 52px;
+    z-index: 90;
+    background: var(--white);
+    border-bottom: 1px solid var(--canvas-shade);
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: none;
+    border: 1.5px solid var(--canvas-shade);
+    color: var(--forest);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover {
+    border-color: var(--purple);
+    color: var(--purple);
+  }
+  .filter-btn.active {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: var(--white);
+  }
+  .filter-btn.attending-btn {
+    background: var(--green-light);
+    border-color: var(--green);
+    color: var(--green);
+    display: none;
+  }
+  .filter-btn.attending-btn.visible { display: inline-flex; align-items: center; gap: 6px; }
+  .filter-btn.attending-btn.active { background: var(--green); color: var(--white); border-color: var(--green); }
+  .filterbar-spacer { flex: 1; }
+  .view-toggle {
+    display: flex;
+    background: var(--canvas);
+    border: 1.5px solid var(--canvas-shade);
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 2px;
+    gap: 2px;
+  }
+  .view-btn {
+    background: none;
+    border: none;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--forest);
+    border-radius: 6px;
+    transition: all 0.15s;
+    opacity: 0.55;
+  }
+  .view-btn.active {
+    background: var(--white);
+    opacity: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    padding: 28px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* ── MONTH DIVIDERS ── */
+  .month-divider {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(27,40,36,0.35);
+    padding: 20px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .month-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--canvas-shade);
+  }
+
+  /* ── TIMELINE VIEW ── */
+  #timeline-view { display: flex; flex-direction: column; gap: 10px; }
+  #grid-view {
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  #grid-view.active { display: grid; }
+
+  /* ── EVENT CARD (TIMELINE) ── */
+  .event-card {
+    background: var(--white);
+    border-radius: 14px;
+    display: flex;
+    box-shadow: 0 1px 3px rgba(17,26,23,0.06);
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+  }
+  .event-card:hover {
+    box-shadow: 0 6px 20px rgba(17,26,23,0.12);
+    transform: translateY(-1px);
+  }
+  .event-card.past {
+    opacity: 0.65;
+  }
+  .event-card.past:hover {
+    transform: none;
+    box-shadow: 0 1px 3px rgba(17,26,23,0.06);
+  }
+  .event-card.critical-week {
+    box-shadow: 0 0 0 2px var(--orange), 0 4px 16px rgba(236,145,81,0.2);
+  }
+  .event-card.critical-week:hover {
+    box-shadow: 0 0 0 2px var(--orange), 0 8px 24px rgba(236,145,81,0.25);
+  }
+
+  /* Priority left border */
+  .event-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 14px 0 0 14px;
+  }
+  .event-card.priority-critical::before { background: #E53935; }
+  .event-card.priority-high::before { background: var(--orange); }
+  .event-card.priority-medium::before { background: var(--yellow); }
+
+  /* Date column */
+  .card-date {
+    background: var(--forest-shade);
+    width: 76px;
+    min-width: 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 8px;
+    flex-shrink: 0;
+  }
+  .date-month {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 2px;
+  }
+  .date-day {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .date-range-end {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+
+  /* Card body */
+  .card-body {
+    flex: 1;
+    padding: 14px 18px 14px 16px;
+    min-width: 0;
+  }
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--forest);
+    flex: 1;
+    min-width: 180px;
+    line-height: 1.3;
+  }
+  .card-badges {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .badge-past { background: #E8E8E5; color: #888; }
+  .badge-upcoming { background: var(--green-light); color: var(--green); }
+  .badge-this-week {
+    background: #FFF3E0;
+    color: #C45E00;
+    animation: pulse-badge 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse-badge {
+    0%,100% { opacity:1; } 50% { opacity:0.6; }
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .sector-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .sector-rail { background: #EEF2FF; color: #4338CA; }
+  .sector-aviation { background: #E0F2FE; color: #0369A1; }
+  .sector-roads { background: #FEF9EE; color: #92400E; }
+  .sector-urban { background: #F0FDF4; color: #166534; }
+
+  .card-location {
+    font-size: 12px;
+    color: rgba(27,40,36,0.5);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .card-why {
+    font-size: 12px;
+    color: rgba(27,40,36,0.6);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .card-accounts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .account-chip {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 10px;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+  .chip-t1 { background: #EDE9FE; color: var(--purple-shade); }
+  .chip-t2 { background: var(--yellow-tint); color: #5B3E05; }
+  .chip-t3 { background: var(--canvas-shade); color: rgba(27,40,36,0.65); }
+
+  .card-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--purple);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #4A48D8; }
+  .btn-secondary {
+    background: none;
+    color: var(--purple);
+    border: 1.5px solid var(--purple-tint);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { background: #EDE9FE; }
+  .btn-ical {
+    background: none;
+    color: rgba(27,40,36,0.5);
+    border: 1.5px solid var(--canvas-shade);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+  }
+  .btn-ical:hover { border-color: var(--purple-tint); color: var(--purple); }
+
+  /* Attending toggle */
+  .attending-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    cursor: pointer;
+    user-select: none;
+  }
+  .attending-toggle input[type="checkbox"] { display: none; }
+  .attend-check {
+    width: 34px; height: 18px;
+    background: var(--canvas-shade);
+    border-radius: 9px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .attend-check::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 14px; height: 14px;
+    background: var(--white);
+    border-radius: 50%;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .attending-toggle.on .attend-check {
+    background: var(--green);
+  }
+  .attending-toggle.on .attend-check::after {
+    left: 18px;
+  }
+  .attend-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(27,40,36,0.5);
+    transition: color 0.15s;
+  }
+  .attending-toggle.on .attend-label { color: var(--green); }
+  .badge-attending {
+    background: var(--green-light);
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+    display: none;
+  }
+  .attending-toggle.on ~ .badge-attending,
+  .badge-attending.visible { display: inline-block; }
+
+  .btn-prep {
+    background: none;
+    color: var(--green);
+    border: 1.5px solid rgba(46,125,79,0.3);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: none;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+  }
+  .btn-prep:hover { background: var(--green-light); }
+  .prep-visible { display: inline-flex !important; }
+
+  .copied-toast {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .copied-toast.show { opacity: 1; }
+
+  /* ── GRID VIEW CARDS ── */
+  .grid-card {
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(17,26,23,0.06);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+  }
+  .grid-card:hover {
+    box-shadow: 0 6px 20px rgba(17,26,23,0.12);
+    transform: translateY(-2px);
+  }
+  .grid-card.past { opacity: 0.65; }
+  .grid-card.past:hover { transform: none; box-shadow: 0 1px 3px rgba(17,26,23,0.06); }
+  .grid-card.critical-week { box-shadow: 0 0 0 2px var(--orange); }
+  .grid-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+  .grid-card.priority-critical::before { background: #E53935; }
+  .grid-card.priority-high::before { background: var(--orange); }
+  .grid-card.priority-medium::before { background: var(--yellow); }
+
+  .grid-date-strip {
+    background: var(--forest-shade);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .grid-date-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--white);
+  }
+  .grid-body { padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .grid-name { font-size: 13.5px; font-weight: 700; color: var(--forest); line-height: 1.3; }
+  .grid-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .grid-location { font-size: 11px; color: rgba(27,40,36,0.5); display: flex; align-items: center; gap: 3px; }
+  .grid-why { font-size: 11.5px; color: rgba(27,40,36,0.6); line-height: 1.5; flex: 1; }
+  .grid-accounts { display: flex; flex-wrap: wrap; gap: 4px; }
+  .grid-actions { display: flex; gap: 6px; flex-wrap: wrap; padding-top: 4px; border-top: 1px solid var(--canvas); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(27,40,36,0.4);
+  }
+  .empty-state p { font-size: 15px; font-weight: 500; }
+
+  /* ── SUMMARY BAR ── */
+  .summary-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--forest-shade);
+    color: rgba(255,255,255,0.7);
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 200;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .summary-bar span { display: flex; align-items: center; gap: 6px; }
+  .summary-bar strong { color: var(--white); }
+  .summary-divider {
+    width: 1px; height: 18px;
+    background: rgba(255,255,255,0.12);
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--forest);
+    color: rgba(255,255,255,0.35);
+    font-size: 12px;
+    text-align: center;
+    padding: 18px 32px 80px;
+  }
+  .footer a { color: var(--purple-tint); text-decoration: none; }
+  .footer a:hover { color: var(--white); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    #grid-view.active { grid-template-columns: 1fr; }
+    .hero { padding: 28px 24px; }
+    .hero-headline { font-size: 34px; }
+    .main { padding: 20px 16px; }
+    .filterbar { padding: 10px 16px; }
+  }
+  @media (max-width: 700px) {
+    .event-card { flex-direction: column; }
+    .card-date {
+      width: 100%;
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 14px 14px 0 0;
+    }
+    .date-month { font-size: 11px; }
+    .date-day { font-size: 20px; }
+    .hero-stats { flex-wrap: wrap; }
+    .stat-item { padding: 10px 16px; }
+    .summary-bar { gap: 12px; font-size: 11px; }
+    .topbar { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a class="topbar-left" href="#">
+    <span class="arrow">←</span>
+    <span>OS Map</span>
+    <span class="arrow">/</span>
+    <span>Events Calendar</span>
+  </a>
+  <div class="topbar-right">
+    <div class="badge-green">
+      <span class="dot"></span>
+      2026 UK Events
+    </div>
+    <span class="topbar-date" id="topbar-date"></span>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Sector Events · UK · 2026</div>
+  <h1 class="hero-headline">Events Calendar</h1>
+  <p class="hero-sub">Where your prospects will be. Network Rail · TfL · Heathrow · National Highways · ABP · Colas Rail · VolkerRail · MAG · Vinci Airports</p>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <span class="stat-num" id="stat-upcoming">—</span>
+      <span class="stat-label">Upcoming</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" id="stat-past">—</span>
+      <span class="stat-label">Past</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">4</span>
+      <span class="stat-label">Sectors</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">12</span>
+      <span class="stat-label">Accounts</span>
+    </div>
+  </div>
+</section>
+
+<!-- ALERT BANNER -->
+<div class="alert-banner" id="alert-banner">
+  <div>⚡ <strong>Next week:</strong> Rail LIVE 2026 (17–18 Jun) and MOVE London (17–18 Jun) — <a href="https://raillive.org.uk/register" target="_blank" rel="noopener">register now</a> if you haven't already.</div>
+  <button class="alert-dismiss" id="alert-dismiss" title="Dismiss">×</button>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filterbar" id="filterbar">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+  <button class="filter-btn" data-filter="past">Past</button>
+  <button class="filter-btn" data-filter="rail">🚆 Rail</button>
+  <button class="filter-btn" data-filter="aviation">✈️ Aviation</button>
+  <button class="filter-btn" data-filter="roads">🛣️ Roads &amp; Ports</button>
+  <button class="filter-btn" data-filter="urban">🏙️ Urban</button>
+  <button class="filter-btn attending-btn" data-filter="attending" id="my-events-btn">
+    ✓ My Events <span id="attending-count"></span>
+  </button>
+  <div class="filterbar-spacer"></div>
+  <div class="view-toggle">
+    <button class="view-btn active" id="btn-timeline">Timeline</button>
+    <button class="view-btn" id="btn-grid">Grid</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+  <div id="timeline-view"></div>
+  <div id="grid-view"></div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <a href="#">← Back to OS Map</a> &nbsp;·&nbsp; Cogna Events Calendar 2026 &nbsp;·&nbsp; Physical industries, real-world impact
+</footer>
+
+<!-- SUMMARY BAR -->
+<div class="summary-bar" id="summary-bar">
+  <span><strong id="sb-total">—</strong> events this year</span>
+  <div class="summary-divider"></div>
+  <span><strong id="sb-upcoming">—</strong> upcoming</span>
+  <div class="summary-divider"></div>
+  <span><strong id="sb-attending">0</strong> attending</span>
+  <div class="summary-divider"></div>
+  <span>Next: <strong id="sb-next">—</strong></span>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+const EVENTS = [
+  {
+    id: 'raes-aviation-summit',
+    name: 'RAeS Commercial Aviation Summit 2026',
+    date: '2026-03-03',
+    dateEnd: '2026-03-04',
+    sector: 'aviation',
+    location: 'InterContinental Park Lane, London',
+    status: 'past',
+    priority: 'high',
+    accounts: ['Heathrow Airport', 'Manchester Airport Group', 'Vinci Airports'],
+    why: 'Premier UK aviation industry summit. CAA priorities, commercial aviation workforce trends, airport operations leadership.',
+    url: 'https://www.aerosociety.com/events-calendar/raes-commercial-aviation-summit-2026/'
+  },
+  {
+    id: 'uk-rail-summit',
+    name: 'UK Rail Summit 2026',
+    date: '2026-04-17',
+    dateEnd: '2026-04-17',
+    sector: 'rail',
+    location: 'KPMG, 15 Canada Square, London',
+    status: 'past',
+    priority: 'high',
+    accounts: ['Network Rail', 'TfL', 'LNER', 'Colas Rail', 'VolkerRail'],
+    why: 'GBR transition legislation scrutiny. Senior rail reform figures. Network Rail and TOC leadership in the room.',
+    url: 'https://www.transporttimes.co.uk/conferences.php/UK-Rail-Summit-90/'
+  },
+  {
+    id: 'uk-rail-nec',
+    name: 'UK Rail 2026 — NEC Birmingham',
+    date: '2026-05-13',
+    dateEnd: '2026-05-14',
+    sector: 'rail',
+    location: 'NEC Birmingham',
+    status: 'past',
+    priority: 'high',
+    accounts: ['Network Rail', 'Colas Rail', 'VolkerRail', 'LNER'],
+    why: 'Largest UK rail exhibition. Full supply chain — infrastructure, digital transformation, asset management. NR and major contractors exhibit.',
+    url: 'https://railway-news.com/event-exhibition/uk-rail-2026/'
+  },
+  {
+    id: 'uk-ports-conference',
+    name: 'UK Ports Conference 2026',
+    date: '2026-06-03',
+    dateEnd: '2026-06-04',
+    sector: 'roads',
+    location: 'Holiday Inn Bloomsbury, London',
+    status: 'past',
+    priority: 'medium',
+    accounts: ['Associated British Ports', 'Port of London'],
+    why: 'Senior UK port operators and policy leads. Asset management, new technologies, sustainability, future fuels.',
+    url: 'https://waterfrontconferencecompany.com/conferences/uk-ports-conference-2026'
+  },
+  {
+    id: 'rail-live',
+    name: 'Rail LIVE 2026',
+    date: '2026-06-17',
+    dateEnd: '2026-06-18',
+    sector: 'rail',
+    location: "Porterbrook's Long Marston Rail Innovation Centre, Stratford-upon-Avon",
+    status: 'upcoming',
+    priority: 'critical',
+    accounts: ['Network Rail', 'Colas Rail', 'VolkerRail'],
+    why: '7,000+ rail professionals. Live rail environment demonstrations. Strategy & Leadership and Engineering & Safety seminar theatres. NR, contractors and supply chain all present. Best networking event in the rail calendar.',
+    registerUrl: 'https://raillive.org.uk/register',
+    url: 'https://raillive.org.uk/'
+  },
+  {
+    id: 'move-london',
+    name: 'MOVE London 2026',
+    date: '2026-06-17',
+    dateEnd: '2026-06-18',
+    sector: 'urban',
+    location: 'London',
+    status: 'upcoming',
+    priority: 'high',
+    accounts: ['Transport for London'],
+    why: 'Future of sustainable urban transport. TfL and urban mobility leaders. ZEV transition, digital mobility, integrated transport systems.',
+    url: 'https://www.tradefairdates.com/MOVE-M10186/London.html'
+  },
+  {
+    id: 'ice-resilient-transport',
+    name: 'ICE Resilient Transport 2026',
+    date: '2026-09-23',
+    dateEnd: '2026-09-25',
+    sector: 'roads',
+    location: 'Manchester',
+    status: 'upcoming',
+    priority: 'medium',
+    accounts: ['National Highways', 'Transport Scotland', 'Associated British Ports'],
+    why: 'ICE flagship transport infrastructure event. Innovation, adaptation and asset management. National Highways and roads sector leadership.',
+    url: 'https://www.ice.org.uk/events/conferences/resilient-transport'
+  },
+  {
+    id: 'highways-uk',
+    name: 'Highways UK 2026',
+    date: '2026-10-14',
+    dateEnd: '2026-10-15',
+    sector: 'roads',
+    location: 'Hall 5, NEC Birmingham',
+    status: 'upcoming',
+    priority: 'high',
+    accounts: ['National Highways', 'Transport Scotland'],
+    why: 'Entire UK road infrastructure supply chain at the NEC. National Highways always present. Strategic investment, digital twins, sustainability, local delivery.',
+    url: 'https://www.terrapinn.com/exhibition/highways-uk/index.stm'
+  },
+  {
+    id: 'bpa-conference',
+    name: 'British Ports Association Conference 2026',
+    date: '2026-10-21',
+    dateEnd: '2026-10-22',
+    sector: 'roads',
+    location: 'Cruise Terminal One, Port of Dover',
+    status: 'upcoming',
+    priority: 'high',
+    accounts: ['Associated British Ports', 'Port of London'],
+    why: 'THE ports industry event. 450 delegates (sold out in 2025). ABP, Port of London and all major UK port operators attend. Policy, technology and future of UK ports.',
+    url: 'https://www.britishports.org.uk/events/'
+  },
+  {
+    id: 'ria-annual',
+    name: 'RIA Annual Conference 2026',
+    date: '2026-11-04',
+    dateEnd: '2026-11-05',
+    sector: 'rail',
+    location: 'Leonardo Royal Hotel London Tower Bridge',
+    status: 'upcoming',
+    priority: 'high',
+    accounts: ['Network Rail', 'Colas Rail', 'VolkerRail', 'LNER'],
+    why: 'Rail industry leaders, influencers, international guests and policy makers. Two-day programme: keynotes, panels, networking. NR and major contractors always well represented.',
+    url: 'https://www.riagb.org.uk/RIA/RIA/Events/2026/AC26/RIA_Annual_Conference_2026.aspx?EventKey=AC26'
+  }
+];
+
+// Account tier mapping
+const ACCOUNT_TIERS = {
+  'Network Rail': 't1',
+  'Heathrow Airport': 't1',
+  'Transport for London': 't1',
+  'TfL': 't1',
+  'LNER': 't2',
+  'National Highways': 't2',
+  'Manchester Airport Group': 't2',
+  'Associated British Ports': 't2',
+  'Heathrow Express': 't2',
+  'MAG': 't2',
+  'Colas Rail': 't3',
+  'VolkerRail': 't3',
+  'Transport Scotland': 't3',
+  'Port of London': 't3',
+  'Vinci Airports': 't3'
+};
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let attending = JSON.parse(localStorage.getItem('events_attending') || '[]');
+let activeFilter = 'all';
+let activeView = 'timeline';
+const TODAY = new Date();
+TODAY.setHours(0,0,0,0);
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function parseDate(str) {
+  const [y,m,d] = str.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+
+function daysUntil(dateStr) {
+  const d = parseDate(dateStr);
+  return Math.ceil((d - TODAY) / 86400000);
+}
+
+function formatDateRange(start, end) {
+  const s = parseDate(start);
+  const e = parseDate(end);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if (start === end) return `${s.getDate()} ${months[s.getMonth()]}`;
+  if (s.getMonth() === e.getMonth()) return `${s.getDate()}–${e.getDate()} ${months[s.getMonth()]}`;
+  return `${s.getDate()} ${months[s.getMonth()]} – ${e.getDate()} ${months[e.getMonth()]}`;
+}
+
+function getMonthLabel(dateStr) {
+  const d = parseDate(dateStr);
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return `${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function isNextTwoWeeks(event) {
+  const days = daysUntil(event.date);
+  return days >= 0 && days <= 14;
+}
+
+function getStatusBadge(event) {
+  if (event.status === 'past') return '<span class="badge badge-past">Past</span>';
+  if (isNextTwoWeeks(event)) {
+    const days = daysUntil(event.date);
+    const label = days <= 7 ? '⚡ This week' : '⚡ Next week';
+    return `<span class="badge badge-this-week">${label}</span>`;
+  }
+  return '<span class="badge badge-upcoming">Upcoming</span>';
+}
+
+function getAccountChips(accounts) {
+  return accounts.map(a => {
+    const tier = ACCOUNT_TIERS[a] || 't3';
+    return `<span class="account-chip chip-${tier}">${a}</span>`;
+  }).join('');
+}
+
+function getSectorTag(sector) {
+  const map = {
+    rail: ['sector-rail', '🚆 Rail'],
+    aviation: ['sector-aviation', '✈️ Aviation'],
+    roads: ['sector-roads', '🛣️ Roads & Ports'],
+    urban: ['sector-urban', '🏙️ Urban']
+  };
+  const [cls, label] = map[sector] || ['', sector];
+  return `<span class="sector-tag ${cls}">${label}</span>`;
+}
+
+function makeICS(event) {
+  const fmt = s => s.replace(/-/g,'');
+  const title = event.name.replace(/,/g,'\\,');
+  const desc = `${event.why}\\n\\nMore info: ${event.url || ''}`;
+  const loc = (event.location || '').replace(/,/g,'\\,');
+  const dtstart = fmt(event.date);
+  const dtend = (() => {
+    if (!event.dateEnd || event.dateEnd === event.date) {
+      // next day
+      const d = parseDate(event.date);
+      d.setDate(d.getDate()+1);
+      return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    }
+    const d = parseDate(event.dateEnd);
+    d.setDate(d.getDate()+1);
+    return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  })();
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Cogna OS Map//Events Calendar//EN',
+    'BEGIN:VEVENT',
+    `DTSTART;VALUE=DATE:${dtstart}`,
+    `DTEND;VALUE=DATE:${dtend}`,
+    `SUMMARY:${title}`,
+    `DESCRIPTION:${desc}`,
+    `LOCATION:${loc}`,
+    `URL:${event.url || ''}`,
+    `UID:${event.id}@cogna.co`,
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+  return ics;
+}
+
+function downloadICS(event) {
+  const ics = makeICS(event);
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${event.id}.ics`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function getPrepPrompt(event) {
+  const accs = event.accounts.join(', ');
+  return `RECON, research who from ${accs} will be at ${event.name} and what topics I should prepare for.`;
+}
+
+function toggleAttending(id) {
+  if (attending.includes(id)) {
+    attending = attending.filter(x => x !== id);
+  } else {
+    attending.push(id);
+  }
+  localStorage.setItem('events_attending', JSON.stringify(attending));
+  updateAttendingUI();
+  render();
+}
+
+// ─────────────────────────────────────────────
+// FILTER
+// ─────────────────────────────────────────────
+function filteredEvents() {
+  let evts = [...EVENTS];
+  if (activeFilter === 'upcoming') evts = evts.filter(e => e.status === 'upcoming');
+  else if (activeFilter === 'past') evts = evts.filter(e => e.status === 'past');
+  else if (activeFilter === 'attending') evts = evts.filter(e => attending.includes(e.id));
+  else if (['rail','aviation','roads','urban'].includes(activeFilter)) {
+    evts = evts.filter(e => e.sector === activeFilter);
+  }
+  return evts;
+}
+
+// ─────────────────────────────────────────────
+// RENDER TIMELINE
+// ─────────────────────────────────────────────
+function renderTimeline(events) {
+  const container = document.getElementById('timeline-view');
+  container.innerHTML = '';
+
+  if (!events.length) {
+    container.innerHTML = '<div class="empty-state"><p>No events match this filter.</p></div>';
+    return;
+  }
+
+  let lastMonth = '';
+  events.forEach(ev => {
+    const month = getMonthLabel(ev.date);
+    if (month !== lastMonth) {
+      const div = document.createElement('div');
+      div.className = 'month-divider';
+      div.textContent = month;
+      container.appendChild(div);
+      lastMonth = month;
+    }
+
+    const card = buildTimelineCard(ev);
+    container.appendChild(card);
+  });
+}
+
+function buildTimelineCard(ev) {
+  const d = parseDate(ev.date);
+  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const isMultiDay = ev.dateEnd && ev.dateEnd !== ev.date;
+  const endD = isMultiDay ? parseDate(ev.dateEnd) : null;
+  const isCritical = isNextTwoWeeks(ev) && ev.status === 'upcoming';
+  const isAttending = attending.includes(ev.id);
+
+  const card = document.createElement('div');
+  card.className = [
+    'event-card',
+    ev.status === 'past' ? 'past' : '',
+    isCritical ? 'critical-week' : '',
+    `priority-${ev.priority}`
+  ].filter(Boolean).join(' ');
+  card.dataset.id = ev.id;
+
+  const dayLabel = isMultiDay
+    ? `<span class="date-day">${d.getDate()}–</span><span class="date-range-end">${endD.getDate()}</span>`
+    : `<span class="date-day">${d.getDate()}</span>`;
+
+  const accountChips = getAccountChips(ev.accounts);
+  const statusBadge = getStatusBadge(ev);
+  const sectorTag = getSectorTag(ev.sector);
+
+  const attendingClass = isAttending ? 'on' : '';
+  const badgeAttendingClass = isAttending ? 'visible' : '';
+  const prepClass = isAttending ? 'prep-visible' : '';
+
+  const actionBtns = ev.status === 'upcoming' ? `
+    ${ev.registerUrl ? `<a class="btn-primary" href="${ev.registerUrl}" target="_blank" rel="noopener">Register →</a>` : ''}
+    <a class="btn-secondary" href="${ev.url}" target="_blank" rel="noopener">Event Info</a>
+  ` : `
+    <a class="btn-secondary" href="${ev.url}" target="_blank" rel="noopener">Event Info</a>
+  `;
+
+  card.innerHTML = `
+    <div class="card-date">
+      <div class="date-month">${months[d.getMonth()]}</div>
+      ${dayLabel}
+    </div>
+    <div class="card-body">
+      <div class="card-top">
+        <div class="card-name">${ev.name}</div>
+        <div class="card-badges">
+          ${statusBadge}
+          <span class="badge-attending ${badgeAttendingClass}">Attending ✓</span>
+        </div>
+      </div>
+      <div class="card-meta">
+        ${sectorTag}
+        <span class="card-location">📍 ${ev.location}</span>
+      </div>
+      <div class="card-why">${ev.why}</div>
+      <div class="card-accounts">${accountChips}</div>
+      <div class="card-actions">
+        ${actionBtns}
+        <button class="btn-ical" data-ical="${ev.id}">📅 Add to Calendar</button>
+        <button class="btn-prep ${prepClass}" data-prep="${ev.id}">→ Run call prep for ${ev.name}</button>
+        <span class="copied-toast" id="toast-${ev.id}">Copied!</span>
+        <label class="attending-toggle ${attendingClass}" title="Mark as attending">
+          <input type="checkbox" ${isAttending ? 'checked' : ''} data-attend="${ev.id}" />
+          <span class="attend-check"></span>
+          <span class="attend-label">Attending</span>
+        </label>
+      </div>
+    </div>
+  `;
+
+  return card;
+}
+
+// ─────────────────────────────────────────────
+// RENDER GRID
+// ─────────────────────────────────────────────
+function renderGrid(events) {
+  const container = document.getElementById('grid-view');
+  container.innerHTML = '';
+
+  if (!events.length) {
+    container.innerHTML = '<div class="empty-state"><p>No events match this filter.</p></div>';
+    return;
+  }
+
+  events.forEach(ev => {
+    const card = buildGridCard(ev);
+    container.appendChild(card);
+  });
+}
+
+function buildGridCard(ev) {
+  const isCritical = isNextTwoWeeks(ev) && ev.status === 'upcoming';
+  const isAttending = attending.includes(ev.id);
+
+  const card = document.createElement('div');
+  card.className = [
+    'grid-card',
+    ev.status === 'past' ? 'past' : '',
+    isCritical ? 'critical-week' : '',
+    `priority-${ev.priority}`
+  ].filter(Boolean).join(' ');
+
+  const dateRange = formatDateRange(ev.date, ev.dateEnd || ev.date);
+  const accountChips = getAccountChips(ev.accounts);
+  const statusBadge = getStatusBadge(ev);
+  const sectorTag = getSectorTag(ev.sector);
+
+  const attendingClass = isAttending ? 'on' : '';
+  const badgeAttendingClass = isAttending ? 'visible' : '';
+  const prepClass = isAttending ? 'prep-visible' : '';
+
+  const actionBtns = ev.status === 'upcoming' ? `
+    ${ev.registerUrl ? `<a class="btn-primary" href="${ev.registerUrl}" target="_blank" rel="noopener" style="font-size:11px;padding:4px 10px;">Register →</a>` : ''}
+    <a class="btn-secondary" href="${ev.url}" target="_blank" rel="noopener" style="font-size:11px;padding:4px 10px;">Info</a>
+  ` : `
+    <a class="btn-secondary" href="${ev.url}" target="_blank" rel="noopener" style="font-size:11px;padding:4px 10px;">Info</a>
+  `;
+
+  card.innerHTML = `
+    <div class="grid-date-strip">
+      <span class="grid-date-text">${dateRange}</span>
+      <div style="display:flex;gap:5px;align-items:center;">
+        ${statusBadge}
+        <span class="badge-attending ${badgeAttendingClass}" style="font-size:9px;padding:2px 6px;">Attending ✓</span>
+      </div>
+    </div>
+    <div class="grid-body">
+      <div class="grid-name">${ev.name}</div>
+      <div class="grid-meta">
+        ${sectorTag}
+        <span class="grid-location">📍 ${ev.location}</span>
+      </div>
+      <div class="grid-why">${ev.why}</div>
+      <div class="grid-accounts">${accountChips}</div>
+      <div class="grid-actions">
+        ${actionBtns}
+        <button class="btn-ical" data-ical="${ev.id}" style="font-size:11px;padding:4px 10px;">📅 .ics</button>
+        <button class="btn-prep ${prepClass}" data-prep="${ev.id}" style="font-size:11px;padding:4px 10px;">→ Prep</button>
+        <span class="copied-toast" id="toast-grid-${ev.id}">Copied!</span>
+        <label class="attending-toggle ${attendingClass}" style="margin-left:auto;">
+          <input type="checkbox" ${isAttending ? 'checked' : ''} data-attend="${ev.id}" />
+          <span class="attend-check"></span>
+          <span class="attend-label">Attending</span>
+        </label>
+      </div>
+    </div>
+  `;
+
+  return card;
+}
+
+// ─────────────────────────────────────────────
+// MAIN RENDER
+// ─────────────────────────────────────────────
+function render() {
+  const events = filteredEvents();
+
+  if (activeView === 'timeline') {
+    document.getElementById('timeline-view').style.display = 'flex';
+    document.getElementById('grid-view').classList.remove('active');
+    renderTimeline(events);
+  } else {
+    document.getElementById('timeline-view').style.display = 'none';
+    document.getElementById('grid-view').classList.add('active');
+    renderGrid(events);
+  }
+
+  updateSummaryBar();
+}
+
+// ─────────────────────────────────────────────
+// SUMMARY BAR
+// ─────────────────────────────────────────────
+function updateSummaryBar() {
+  const total = EVENTS.length;
+  const upcoming = EVENTS.filter(e => e.status === 'upcoming').length;
+  const attendingCount = attending.length;
+
+  const nextEvent = EVENTS
+    .filter(e => e.status === 'upcoming')
+    .sort((a,b) => parseDate(a.date) - parseDate(b.date))[0];
+
+  let nextLabel = '—';
+  if (nextEvent) {
+    const days = daysUntil(nextEvent.date);
+    const name = nextEvent.name.length > 24 ? nextEvent.name.substring(0,22)+'…' : nextEvent.name;
+    nextLabel = `${name} in ${days}d`;
+  }
+
+  document.getElementById('sb-total').textContent = total;
+  document.getElementById('sb-upcoming').textContent = upcoming;
+  document.getElementById('sb-attending').textContent = attendingCount;
+  document.getElementById('sb-next').textContent = nextLabel;
+
+  document.getElementById('stat-upcoming').textContent = upcoming;
+  document.getElementById('stat-past').textContent = EVENTS.filter(e=>e.status==='past').length;
+}
+
+// ─────────────────────────────────────────────
+// ATTENDING UI
+// ─────────────────────────────────────────────
+function updateAttendingUI() {
+  const btn = document.getElementById('my-events-btn');
+  const countEl = document.getElementById('attending-count');
+  if (attending.length > 0) {
+    btn.classList.add('visible');
+    countEl.textContent = `(${attending.length})`;
+  } else {
+    btn.classList.remove('visible');
+    if (activeFilter === 'attending') {
+      activeFilter = 'all';
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.filter === 'all');
+      });
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// EVENT LISTENERS
+// ─────────────────────────────────────────────
+
+// Delegated events for cards
+document.addEventListener('click', function(e) {
+  // Attending checkbox
+  const attendInput = e.target.closest('[data-attend]');
+  if (attendInput) {
+    const id = attendInput.getAttribute('data-attend') || attendInput.closest('[data-attend]')?.getAttribute('data-attend');
+    if (id) { toggleAttending(id); return; }
+  }
+
+  // Attending toggle label
+  if (e.target.classList.contains('attend-check') || e.target.classList.contains('attend-label')) {
+    const label = e.target.closest('.attending-toggle');
+    if (label) {
+      const inp = label.querySelector('input[data-attend]');
+      if (inp) { toggleAttending(inp.getAttribute('data-attend')); return; }
+    }
+  }
+
+  // ICS download
+  const icalBtn = e.target.closest('[data-ical]');
+  if (icalBtn) {
+    const id = icalBtn.getAttribute('data-ical');
+    const ev = EVENTS.find(e => e.id === id);
+    if (ev) downloadICS(ev);
+    return;
+  }
+
+  // Prep copy
+  const prepBtn = e.target.closest('[data-prep]');
+  if (prepBtn) {
+    const id = prepBtn.getAttribute('data-prep');
+    const ev = EVENTS.find(e => e.id === id);
+    if (ev) {
+      navigator.clipboard.writeText(getPrepPrompt(ev)).catch(() => {});
+      // Show toasts
+      ['toast-'+id, 'toast-grid-'+id].forEach(tid => {
+        const toast = document.getElementById(tid);
+        if (toast) {
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+      });
+    }
+    return;
+  }
+});
+
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeFilter = btn.dataset.filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  });
+});
+
+// View toggle
+document.getElementById('btn-timeline').addEventListener('click', () => {
+  activeView = 'timeline';
+  document.getElementById('btn-timeline').classList.add('active');
+  document.getElementById('btn-grid').classList.remove('active');
+  render();
+});
+document.getElementById('btn-grid').addEventListener('click', () => {
+  activeView = 'grid';
+  document.getElementById('btn-grid').classList.add('active');
+  document.getElementById('btn-timeline').classList.remove('active');
+  render();
+});
+
+// Alert dismiss
+const alertBanner = document.getElementById('alert-banner');
+const alertDismiss = document.getElementById('alert-dismiss');
+
+if (localStorage.getItem('alert_dismissed_june26') === '1') {
+  alertBanner.classList.add('hidden');
+}
+
+alertDismiss.addEventListener('click', () => {
+  alertBanner.classList.add('hidden');
+  localStorage.setItem('alert_dismissed_june26', '1');
+});
+
+// Check if alert should show (only if upcoming events in next 14 days exist)
+const hasUrgent = EVENTS.some(e => e.status === 'upcoming' && isNextTwoWeeks(e));
+if (!hasUrgent) alertBanner.classList.add('hidden');
+
+// Topbar date
+document.getElementById('topbar-date').textContent = TODAY.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+updateAttendingUI();
+render();
+</script>
+</body>
+</html>
